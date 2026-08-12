@@ -8,48 +8,82 @@
 <meta name="apple-mobile-web-app-title" content="Odtah Doplatek">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Odtah – výpočet doplatku</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<title>Odtah – doplatek klienta</title>
 <style>
-:root{--blue:#0b5cff;--bg:#f4f6fa;--card:#fff;--text:#172033;--muted:#687386;--line:#dfe4ec}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-header{background:var(--blue);color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:5}
+:root{--blue:#0b5cff;--bg:#f4f6fa;--card:#fff;--text:#172033;--muted:#687386;--line:#dfe4ec;--ok:#12824c;--warn:#b36b00}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:var(--blue);color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1000}
 header h1{font-size:21px;margin:0 0 3px}header p{margin:0;opacity:.9;font-size:13px}
-nav{display:flex;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:73px;z-index:4}
+nav{display:flex;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:73px;z-index:999}
 nav button{flex:1;border:0;background:#eef2f8;color:#344055;padding:10px;border-radius:10px;font-weight:700}
 nav button.active{background:var(--blue);color:#fff}
-main{max-width:760px;margin:auto;padding:14px 12px 40px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+main{max-width:760px;margin:auto;padding:14px 12px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
 h2{font-size:17px;margin:0 0 12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 label{display:block;font-size:13px;color:var(--muted);font-weight:700;margin-bottom:5px}
 input,select{width:100%;padding:12px;border:1px solid #cfd6e2;border-radius:10px;background:#fff;font-size:16px;color:var(--text)}
+button.primary{width:100%;border:0;background:var(--blue);color:#fff;padding:14px;border-radius:11px;font-size:16px;font-weight:800}
+button.secondary{border:0;background:#eef2f8;padding:10px 12px;border-radius:9px;font-weight:700}
+.note{font-size:12px;color:var(--muted);line-height:1.45}.hidden{display:none}
+.pill{display:inline-block;background:#e9f7ef;color:var(--ok);padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}
 .check{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #edf0f4}
 .check:last-child{border-bottom:0}.check input{width:20px;height:20px}.check label{margin:0;color:var(--text);font-size:14px}
 .result{background:#0e1728;color:#fff;border-radius:16px;padding:18px;margin-top:12px}.result .big{font-size:34px;font-weight:800;margin:5px 0 2px}
 .row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #ffffff20}.row:last-child{border:0}
-button.primary{width:100%;border:0;background:var(--blue);color:#fff;padding:14px;border-radius:11px;font-size:16px;font-weight:800}
-button.secondary{border:0;background:#eef2f8;padding:10px 12px;border-radius:9px;font-weight:700}
-.note{font-size:12px;color:var(--muted);line-height:1.45}.hidden{display:none}
-.pill{display:inline-block;background:#e9f7ef;color:#12824c;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}
-@media(max-width:520px){.grid{grid-template-columns:1fr}.result .big{font-size:30px}}
+.autocomplete{position:relative}.suggestions{position:absolute;left:0;right:0;top:100%;z-index:2000;background:#fff;border:1px solid #cfd6e2;border-radius:10px;box-shadow:0 8px 25px #0002;overflow:hidden}
+.suggestion{padding:12px;border-bottom:1px solid #edf0f4;font-size:14px;cursor:pointer}.suggestion:last-child{border-bottom:0}.suggestion:hover{background:#f2f5fa}
+#map{height:330px;border-radius:14px;border:1px solid var(--line);margin-top:12px;overflow:hidden}
+.mapStatus{margin-top:10px;font-size:13px;font-weight:700}.ok{color:var(--ok)}.warn{color:var(--warn)}.error{color:#c62828}
+.smallButton{border:0;background:#eef2f8;padding:8px 10px;border-radius:8px;font-weight:700}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.result .big{font-size:30px}#map{height:290px}}
 </style>
 </head>
 <body>
 <header><h1>Odtah – doplatek klienta</h1><p>Výpočet ceny odtahu • ceny bez DPH</p></header>
-<nav><button id="tabCalc" class="active" onclick="showTab('calc')">Výpočet</button><button id="tabSettings" onclick="showTab('settings')">Ceník</button></nav>
+<nav><button id="tabCalc" class="active" onclick="showTab('calc')">Výpočet</button><button id="tabSettings" onclick="showTab('settings')">Ceník / mapa</button></nav>
+
 <main>
 <section id="calc">
 <div class="card">
 <h2>1. Vozidlo a vzdálenost</h2>
 <label>Kategorie vozidla</label>
-<select id="category" onchange="renderCategoryNote();renderExtras();calculate()"></select>
+<select id="category" onchange="renderCategoryNote();renderExtras();calculate();routeIfReady()"></select>
 <div class="grid" style="margin-top:12px">
-<div><label>Vzdálenost odtahu (km)</label><input id="km" type="number" min="0" step="1" value="0" oninput="calculate()"></div>
+<div><label>Vzdálenost odtahu (km)</label><input id="km" type="number" min="0" step="0.1" value="0" oninput="calculate()"></div>
 <div><label>Limit klienta (Kč bez DPH)</label><input id="limit" type="number" min="0" step="1" value="1652" oninput="calculate()"></div>
 </div>
 <p id="catNote" class="note"></p>
 </div>
 
 <div class="card">
-<h2>2. Datum a čas zásahu</h2>
+<h2>2. Mapa a adresa odtahu</h2>
+<p class="note">Začni psát ulici, číslo nebo město a vyber adresu z nabídky. Potom zadej cíl. Aplikace spočítá skutečnou silniční vzdálenost a vloží ji do kalkulace.</p>
+
+<div class="autocomplete">
+<label>Místo zásahu / naložení</label>
+<input id="fromAddress" autocomplete="off" placeholder="Např. Hlavní 12, Brno">
+<div id="fromSuggestions" class="suggestions hidden"></div>
+</div>
+
+<div class="autocomplete" style="margin-top:12px">
+<label>Cíl odtahu</label>
+<input id="toAddress" autocomplete="off" placeholder="Např. Vídeňská 25, Brno">
+<div id="toSuggestions" class="suggestions hidden"></div>
+</div>
+
+<div class="grid" style="margin-top:12px">
+<button class="primary" onclick="calculateRoute()">Spočítat trasu a km</button>
+<button class="secondary" onclick="clearRoute()">Vymazat trasu</button>
+</div>
+
+<div id="routeStatus" class="mapStatus">Mapa čeká na zadání obou adres.</div>
+<div id="map"></div>
+</div>
+
+<div class="card">
+<h2>3. Datum a čas zásahu</h2>
 <p class="note">Příplatky za víkend, noc a svátek se určují automaticky podle zadaného data a času zásahu. Výchozí hodnota je aktuální čas iPhonu.</p>
 <div class="grid">
 <div><label>Datum zásahu</label><input id="serviceDate" type="date" onchange="calculate()"></div>
@@ -59,12 +93,12 @@ button.secondary{border:0;background:#eef2f8;padding:10px 12px;border-radius:9px
 </div>
 
 <div class="card">
-<h2>3. Příplatky / služby</h2>
+<h2>4. Příplatky / služby</h2>
 <div id="extras"></div>
 </div>
 
 <div class="card">
-<h2>4. Výsledek</h2>
+<h2>5. Výsledek</h2>
 <div class="result">
 <div class="row"><span>Odtah</span><b id="baseOut">0 Kč</b></div>
 <div class="row"><span>Příplatky</span><b id="extrasOut">0 Kč</b></div>
@@ -76,14 +110,22 @@ button.secondary{border:0;background:#eef2f8;padding:10px 12px;border-radius:9px
 
 <div class="card">
 <button class="primary" onclick="calculate()">Přepočítat</button>
-<p class="note" style="margin-bottom:0">Cena odtahu = počet km × cena za 1 km. Žádný paušál za odtah se nepřičítá.</p>
+<p class="note" style="margin-bottom:0">Cena odtahu = počet km × cena za 1 km. Silniční vzdálenost z mapy se automaticky zapíše do pole vzdálenosti.</p>
 </div>
 </section>
 
 <section id="settings" class="hidden">
 <div class="card">
+<h2>Geoapify API</h2>
+<p class="note">API klíč se ukládá pouze do tohoto zařízení v localStorage. Není vložený přímo do veřejného GitHub souboru. Pro veřejné použití doporučuji v Geoapify nastavit povolený HTTP referrer pro tvoji GitHub Pages adresu.</p>
+<label>Geoapify API klíč</label>
+<input id="geoKey" type="password" placeholder="Vlož svůj Geoapify API key">
+<button class="primary" style="margin-top:10px" onclick="saveGeoKey()">Uložit API klíč</button>
+<p id="keyStatus" class="note"></p>
+</div>
+
+<div class="card">
 <h2>Ceník – ceny lze kdykoliv změnit</h2>
-<p class="note">Cena za 1 km je pro každou kategorii samostatná. Výchozí hodnota je 0 Kč, protože ji chceš doplnit podle aktuálního ceníku. Víkend, noc a české svátky se v kalkulaci aktivují automaticky podle data a času zásahu. Svátky zahrnují státní i ostatní svátky podle českého zákona, včetně Velkého pátku a Velikonočního pondělí.</p>
 <div id="priceTables"></div>
 <button class="primary" onclick="saveSettings()">Uložit ceník</button>
 <button class="secondary" style="margin-top:8px;width:100%" onclick="resetSettings()">Obnovit výchozí ceny</button>
@@ -91,6 +133,7 @@ button.secondary{border:0;background:#eef2f8;padding:10px 12px;border-radius:9px
 </section>
 </main>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const defaultData={
 categories:[
@@ -99,180 +142,197 @@ categories:[
 {id:"c",name:"Odtah 2,2–3,5 t – nadrozměrná vozidla",km:0,extras:{manip:900,recovery:900,waiting:300}},
 {id:"d",name:"Odtah nad 3,5–6,5 t",km:0,extras:{manip:1700,recovery:2000,waiting:500}}
 ],
-general:{
-weekend:250,night:600,holiday:600,difficult:350,secondVehicleKm:6.5,
-storageUnder35:150,storageOver35:50,transportPersonsKm:15,
-weekendOver35:650,nightOver35:1200
-}};
+general:{weekend:250,night:600,holiday:600,difficult:350,secondVehicleKm:6.5,storageUnder35:150,storageOver35:50,transportPersonsKm:15,weekendOver35:650,nightOver35:1200}
+};
 let data=JSON.parse(localStorage.getItem("odtahCenik2026")||"null")||structuredClone(defaultData);
-if(data && data.general && data.general.holiday==null) data.general.holiday=Number(data.general.night)||600;
+if(data.general.holiday==null)data.general.holiday=600;
+
 const money=n=>new Intl.NumberFormat("cs-CZ",{maximumFractionDigits:2}).format(n)+" Kč";
+const pad2=n=>String(n).padStart(2,"0");
+const localDateKey=d=>`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+
 function current(){return data.categories[+document.getElementById("category").value||0]}
 function populate(){
-const s=document.getElementById("category");s.innerHTML="";
-data.categories.forEach((c,i)=>{let o=document.createElement("option");o.value=i;o.textContent=c.name;s.appendChild(o)});
-renderCategoryNote();renderExtras();renderSettings();calculate();
+ const s=document.getElementById("category");s.innerHTML="";
+ data.categories.forEach((c,i)=>{let o=document.createElement("option");o.value=i;o.textContent=c.name;s.appendChild(o)});
+ renderCategoryNote();renderExtras();renderSettings();calculate();updateKeyStatus();
 }
-function renderCategoryNote(){
-const c=current();
-document.getElementById("catNote").innerHTML=`<span class="pill">${money(c.km)} / km</span>`;
-}
+function renderCategoryNote(){document.getElementById("catNote").innerHTML=`<span class="pill">${money(current().km)} / km</span>`}
 function renderExtras(){
-const c=current(),g=data.general;
-const list=[
-["manip","Naložení / složení vozidla",c.extras.manip],
-["recovery","Vyproštění vozidla",c.extras.recovery],
-["waiting","Čekací doba – 30 min",c.extras.waiting],
-["difficult","Příplatek za ztíženou manipulaci",g.difficult]
-];
-document.getElementById("extras").innerHTML=list.map(x=>`<div class="check"><input id="x_${x[0]}" type="checkbox" onchange="calculate()"><label for="x_${x[0]}">${x[1]} <span style="color:#687386">(${money(x[2])})</span></label></div>`).join("")+
-`<div class="grid" style="margin-top:12px">
-<div><label>Druhé vozidlo – km</label><input id="secondKm" type="number" min="0" value="0" oninput="calculate()"></div>
-<div><label>Přeprava osob – km</label><input id="personsKm" type="number" min="0" value="0" oninput="calculate()"></div>
-<div><label>Uskladnění do 3,5 t – dny</label><input id="storageU" type="number" min="0" value="0" oninput="calculate()"></div>
-<div><label>Uskladnění nad 3,5 t – dny</label><input id="storageO" type="number" min="0" value="0" oninput="calculate()"></div>
-</div>`;
+ const c=current(),g=data.general;
+ const list=[["manip","Naložení / složení vozidla",c.extras.manip],["recovery","Vyproštění vozidla",c.extras.recovery],["waiting","Čekací doba – 30 min",c.extras.waiting],["difficult","Příplatek za ztíženou manipulaci",g.difficult]];
+ document.getElementById("extras").innerHTML=list.map(x=>`<div class="check"><input id="x_${x[0]}" type="checkbox" onchange="calculate()"><label for="x_${x[0]}">${x[1]} <span style="color:#687386">(${money(x[2])})</span></label></div>`).join("")+
+ `<div class="grid" style="margin-top:12px">
+ <div><label>Druhé vozidlo – km</label><input id="secondKm" type="number" min="0" value="0" oninput="calculate()"></div>
+ <div><label>Přeprava osob – km</label><input id="personsKm" type="number" min="0" value="0" oninput="calculate()"></div>
+ <div><label>Uskladnění do 3,5 t – dny</label><input id="storageU" type="number" min="0" value="0" oninput="calculate()"></div>
+ <div><label>Uskladnění nad 3,5 t – dny</label><input id="storageO" type="number" min="0" value="0" oninput="calculate()"></div></div>`;
 }
 
-const CZ_HOLIDAYS_FIXED = {
-  "01-01":"Nový rok / Den obnovy samostatného českého státu",
-  "05-01":"Svátek práce",
-  "05-08":"Den vítězství",
-  "07-05":"Den slovanských věrozvěstů Cyrila a Metoděje",
-  "07-06":"Den upálení mistra Jana Husa",
-  "09-28":"Den české státnosti",
-  "10-28":"Den vzniku samostatného československého státu",
-  "11-17":"Den boje za svobodu a demokracii",
-  "12-24":"Štědrý den",
-  "12-25":"1. svátek vánoční",
-  "12-26":"2. svátek vánoční"
-};
-
+const CZ_HOLIDAYS_FIXED={"01-01":"Nový rok / Den obnovy samostatného českého státu","05-01":"Svátek práce","05-08":"Den vítězství","07-05":"Den slovanských věrozvěstů Cyrila a Metoděje","07-06":"Den upálení mistra Jana Husa","09-28":"Den české státnosti","10-28":"Den vzniku samostatného československého státu","11-17":"Den boje za svobodu a demokracii","12-24":"Štědrý den","12-25":"1. svátek vánoční","12-26":"2. svátek vánoční"};
 function easterSunday(year){
-  // Anonymous Gregorian algorithm.
-  const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,
-        f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,
-        i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,
-        m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),
-        day=((h+l-7*m+114)%31)+1;
-  return new Date(year,month-1,day);
+ const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;
+ return new Date(year,month-1,day);
 }
-function pad2(n){return String(n).padStart(2,"0")}
-function localDateKey(d){return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`}
 function getCzechHolidayName(d){
-  const fixed=`${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
-  if(CZ_HOLIDAYS_FIXED[fixed]) return CZ_HOLIDAYS_FIXED[fixed];
-  const key=localDateKey(d);
-  const easter=easterSunday(d.getFullYear());
-  const goodFriday=new Date(easter); goodFriday.setDate(easter.getDate()-2);
-  const easterMonday=new Date(easter); easterMonday.setDate(easter.getDate()+1);
-  if(key===localDateKey(goodFriday)) return "Velký pátek";
-  if(key===localDateKey(easterMonday)) return "Velikonoční pondělí";
-  return "";
+ const fixed=`${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+ if(CZ_HOLIDAYS_FIXED[fixed])return CZ_HOLIDAYS_FIXED[fixed];
+ const easter=easterSunday(d.getFullYear()),good=new Date(easter),mon=new Date(easter);
+ good.setDate(easter.getDate()-2);mon.setDate(easter.getDate()+1);
+ if(localDateKey(d)===localDateKey(good))return"Velký pátek";
+ if(localDateKey(d)===localDateKey(mon))return"Velikonoční pondělí";
+ return"";
 }
-function isCzechHoliday(d){return !!getCzechHolidayName(d)}
 function getServiceDate(){
-  const ds=document.getElementById("serviceDate")?.value;
-  const ts=document.getElementById("serviceTime")?.value;
-  if(!ds||!ts) return new Date();
-  const [y,m,d]=ds.split("-").map(Number),[hh,mm]=ts.split(":").map(Number);
-  return new Date(y,m-1,d,hh,mm,0,0);
+ const ds=document.getElementById("serviceDate").value,ts=document.getElementById("serviceTime").value;
+ if(!ds||!ts)return new Date();
+ const [y,m,d]=ds.split("-").map(Number),[hh,mm]=ts.split(":").map(Number);
+ return new Date(y,m-1,d,hh,mm);
 }
 function initServiceDateTime(){
-  const now=new Date();
-  const d=document.getElementById("serviceDate"),t=document.getElementById("serviceTime");
-  if(!d.value) d.value=localDateKey(now);
-  if(!t.value) t.value=`${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+ const now=new Date();
+ if(!serviceDate.value)serviceDate.value=localDateKey(now);
+ if(!serviceTime.value)serviceTime.value=`${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
 }
 function renderAutoSurcharges(d){
-  const weekend=d.getDay()===0 || d.getDay()===6;
-  const hour=d.getHours(), minute=d.getMinutes();
-  const minutes=hour*60+minute;
-  const night=minutes>=21*60 || minutes<6*60;
-  const holidayName=getCzechHolidayName(d);
-  const holiday=!!holidayName;
-  const g=data.general;
-  const holidayPrice=Number(g.holiday ?? g.night) || 0;
-  const parts=[];
-  if(weekend) parts.push(`<div class="check"><input type="checkbox" checked disabled><label>🟢 Víkendový příplatek <span style="color:#687386">(+${money(g.weekend)})</span></label></div>`);
-  else parts.push(`<div class="check"><input type="checkbox" disabled><label>⚪ Víkendový příplatek – neaktivní</label></div>`);
-  if(night) parts.push(`<div class="check"><input type="checkbox" checked disabled><label>🟢 Noční příplatek 21:00–06:00 <span style="color:#687386">(+${money(g.night)})</span></label></div>`);
-  else parts.push(`<div class="check"><input type="checkbox" disabled><label>⚪ Noční příplatek – neaktivní</label></div>`);
-  if(holiday) parts.push(`<div class="check"><input type="checkbox" checked disabled><label>🟢 Sváteční příplatek – ${holidayName} <span style="color:#687386">(+${money(holidayPrice)})</span></label></div>`);
-  else parts.push(`<div class="check"><input type="checkbox" disabled><label>⚪ Sváteční příplatek – neaktivní</label></div>`);
-  document.getElementById("autoSurcharges").innerHTML=parts.join("");
-  return {weekend,night,holiday};
+ const weekend=d.getDay()===0||d.getDay()===6,minutes=d.getHours()*60+d.getMinutes(),night=minutes>=1260||minutes<360,holidayName=getCzechHolidayName(d),holiday=!!holidayName,g=data.general;
+ const parts=[];
+ parts.push(`<div class="check"><input type="checkbox" ${weekend?"checked":""} disabled><label>${weekend?"🟢":"⚪"} Víkendový příplatek ${weekend?"<span style='color:#687386'>(+"+money(g.weekend)+")</span>":"– neaktivní"}</label></div>`);
+ parts.push(`<div class="check"><input type="checkbox" ${night?"checked":""} disabled><label>${night?"🟢":"⚪"} Noční příplatek 21:00–06:00 ${night?"<span style='color:#687386'>(+"+money(g.night)+")</span>":"– neaktivní"}</label></div>`);
+ parts.push(`<div class="check"><input type="checkbox" ${holiday?"checked":""} disabled><label>${holiday?"🟢":"⚪"} Sváteční příplatek ${holiday?"– "+holidayName+" <span style='color:#687386'>(+"+money(g.holiday)+")</span>":"– neaktivní"}</label></div>`);
+ document.getElementById("autoSurcharges").innerHTML=parts.join("");
+ return{weekend,night,holiday};
 }
-
 function calculate(){
-const c=current(),km=Number(document.getElementById("km").value)||0,limit=Number(document.getElementById("limit").value)||0;
-const base=km*c.km;let ex=0,g=data.general;
-const serviceDate=getServiceDate();
-const auto=renderAutoSurcharges(serviceDate);
-[["manip",c.extras.manip],["recovery",c.extras.recovery],["waiting",c.extras.waiting],["difficult",g.difficult]].forEach(([k,v])=>{let el=document.getElementById("x_"+k);if(el&&el.checked)ex+=v});
-if(auto.weekend) ex+=g.weekend;
-if(auto.night) ex+=g.night;
-if(auto.holiday) ex+=(Number(g.holiday ?? g.night)||0);
-ex+=(Number(document.getElementById("secondKm")?.value)||0)*g.secondVehicleKm;
-ex+=(Number(document.getElementById("personsKm")?.value)||0)*g.transportPersonsKm;
-ex+=(Number(document.getElementById("storageU")?.value)||0)*g.storageUnder35;
-ex+=(Number(document.getElementById("storageO")?.value)||0)*g.storageOver35;
-const total=base+ex,diff=total-limit;
-document.getElementById("baseOut").textContent=money(base);
-document.getElementById("extrasOut").textContent=money(ex);
-document.getElementById("totalOut").textContent=money(total);
-document.getElementById("limitOut").textContent=money(limit);
-document.getElementById("resultOut").textContent=money(Math.abs(diff));
-document.getElementById("resultLabel").textContent=diff>=0?"Klient má doplatit.":"Klient má přeplatek.";
+ const c=current(),km=Number(document.getElementById("km").value)||0,limit=Number(document.getElementById("limit").value)||0,g=data.general;
+ const auto=renderAutoSurcharges(getServiceDate());let ex=0;
+ [["manip",c.extras.manip],["recovery",c.extras.recovery],["waiting",c.extras.waiting],["difficult",g.difficult]].forEach(([k,v])=>{const el=document.getElementById("x_"+k);if(el&&el.checked)ex+=v});
+ if(auto.weekend)ex+=g.weekend;if(auto.night)ex+=g.night;if(auto.holiday)ex+=g.holiday;
+ ex+=(Number(document.getElementById("secondKm")?.value)||0)*g.secondVehicleKm;
+ ex+=(Number(document.getElementById("personsKm")?.value)||0)*g.transportPersonsKm;
+ ex+=(Number(document.getElementById("storageU")?.value)||0)*g.storageUnder35;
+ ex+=(Number(document.getElementById("storageO")?.value)||0)*g.storageOver35;
+ const base=km*c.km,total=base+ex,diff=total-limit;
+ baseOut.textContent=money(base);extrasOut.textContent=money(ex);totalOut.textContent=money(total);limitOut.textContent=money(limit);
+ resultOut.textContent=money(Math.abs(diff));resultLabel.textContent=diff>=0?"Klient má doplatit.":"Klient má přeplatek.";
 }
 function renderSettings(){
-let h="";
-data.categories.forEach((c,i)=>{h+=`<div class="card" style="box-shadow:none;border-style:dashed"><h2>${c.name}</h2><div class="grid">
-<div><label>Cena za 1 km odtahu</label><input data-path="c.${i}.km" value="${c.km}" type="number" step="0.01" min="0"></div>
-<div><label>Naložení / složení</label><input data-path="c.${i}.extras.manip" value="${c.extras.manip}" type="number" step="0.01"></div>
-<div><label>Vyproštění</label><input data-path="c.${i}.extras.recovery" value="${c.extras.recovery}" type="number" step="0.01"></div>
-<div><label>Čekání 30 min</label><input data-path="c.${i}.extras.waiting" value="${c.extras.waiting}" type="number" step="0.01"></div>
-</div></div>`});
-h+=`<div class="card" style="box-shadow:none;border-style:dashed"><h2>Ostatní služby</h2><div class="grid">
-${setting("Víkend","general.weekend",g().weekend)}
-${setting("Noc 21:00–06:00","general.night",g().night)}
-${setting("Svátek","general.holiday",g().holiday ?? g().night)}
-${setting("Ztížená manipulace","general.difficult",g().difficult)}
-${setting("Druhé vozidlo – Kč/km","general.secondVehicleKm",g().secondVehicleKm)}
-${setting("Uskladnění do 3,5 t – Kč/den","general.storageUnder35",g().storageUnder35)}
-${setting("Uskladnění nad 3,5 t – Kč/den","general.storageOver35",g().storageOver35)}
-${setting("Přeprava osob – Kč/km","general.transportPersonsKm",g().transportPersonsKm)}
-</div></div>`;
-document.getElementById("priceTables").innerHTML=h;
+ let h="";
+ data.categories.forEach((c,i)=>h+=`<div class="card" style="box-shadow:none;border-style:dashed"><h2>${c.name}</h2><div class="grid">
+ <div><label>Cena za 1 km odtahu</label><input data-path="c.${i}.km" value="${c.km}" type="number" step="0.01" min="0"></div>
+ <div><label>Naložení / složení</label><input data-path="c.${i}.extras.manip" value="${c.extras.manip}" type="number" step="0.01"></div>
+ <div><label>Vyproštění</label><input data-path="c.${i}.extras.recovery" value="${c.extras.recovery}" type="number" step="0.01"></div>
+ <div><label>Čekání 30 min</label><input data-path="c.${i}.extras.waiting" value="${c.extras.waiting}" type="number" step="0.01"></div></div></div>`);
+ h+=`<div class="card" style="box-shadow:none;border-style:dashed"><h2>Ostatní služby</h2><div class="grid">
+ ${setting("Víkend","general.weekend",data.general.weekend)}
+ ${setting("Noc 21:00–06:00","general.night",data.general.night)}
+ ${setting("Svátek","general.holiday",data.general.holiday)}
+ ${setting("Ztížená manipulace","general.difficult",data.general.difficult)}
+ ${setting("Druhé vozidlo – Kč/km","general.secondVehicleKm",data.general.secondVehicleKm)}
+ ${setting("Uskladnění do 3,5 t – Kč/den","general.storageUnder35",data.general.storageUnder35)}
+ ${setting("Uskladnění nad 3,5 t – Kč/den","general.storageOver35",data.general.storageOver35)}
+ ${setting("Přeprava osob – Kč/km","general.transportPersonsKm",data.general.transportPersonsKm)}
+ </div></div>`;
+ priceTables.innerHTML=h;
 }
-function g(){return data.general}
-function setting(label,path,value){return `<div><label>${label}</label><input data-path="${path}" value="${value}" type="number" step="0.01"></div>`}
+function setting(label,path,value){return`<div><label>${label}</label><input data-path="${path}" value="${value}" type="number" step="0.01"></div>`}
 function setPath(path,v){
-const p=path.split(".");
-if(p[0]==="c"){
-let c=data.categories[+p[1]];
-if(p[2]==="km")c.km=v;else c.extras[p[3]]=v;
-}else data.general[p[1]]=v;
+ const p=path.split(".");
+ if(p[0]==="c"){const c=data.categories[+p[1]];if(p[2]==="km")c.km=v;else c.extras[p[3]]=v}
+ else data.general[p[1]]=v;
 }
 function saveSettings(){
-document.querySelectorAll("#settings input[data-path]").forEach(el=>setPath(el.dataset.path,Number(el.value)||0));
-localStorage.setItem("odtahCenik2026",JSON.stringify(data));populate();showTab("calc");alert("Ceník byl uložen.");
+ document.querySelectorAll("#settings input[data-path]").forEach(el=>setPath(el.dataset.path,Number(el.value)||0));
+ localStorage.setItem("odtahCenik2026",JSON.stringify(data));populate();showTab("calc");alert("Ceník byl uložen.");
 }
-function resetSettings(){if(confirm("Obnovit výchozí ceny?")){data=structuredClone(defaultData);localStorage.setItem("odtahCenik2026",JSON.stringify(data));populate();}}
-function showTab(t){
-document.getElementById("calc").classList.toggle("hidden",t!=="calc");
-document.getElementById("settings").classList.toggle("hidden",t!=="settings");
-document.getElementById("tabCalc").classList.toggle("active",t==="calc");
-document.getElementById("tabSettings").classList.toggle("active",t==="settings");
-if(t==="settings")renderSettings();
+function resetSettings(){if(confirm("Obnovit výchozí ceny?")){data=structuredClone(defaultData);localStorage.setItem("odtahCenik2026",JSON.stringify(data));populate()}}
+function showTab(t){calc.classList.toggle("hidden",t!=="calc");settings.classList.toggle("hidden",t!=="settings");tabCalc.classList.toggle("active",t==="calc");tabSettings.classList.toggle("active",t==="settings");if(t==="settings")renderSettings();updateKeyStatus()}
+
+/* ---------------- Geoapify map ---------------- */
+let map,fromMarker,toMarker,routeLayer,fromPlace=null,toPlace=null,autocompleteTimers={};
+function getGeoKey(){return localStorage.getItem("geoapifyApiKey")||""}
+function saveGeoKey(){const key=document.getElementById("geoKey").value.trim();if(!key){alert("Vlož API klíč.");return}localStorage.setItem("geoapifyApiKey",key);updateKeyStatus();alert("Geoapify API klíč byl uložen do tohoto zařízení.");initMap()}
+function updateKeyStatus(){const el=document.getElementById("keyStatus");if(!el)return;el.textContent=getGeoKey()?"API klíč je uložen v tomto zařízení.":"API klíč zatím není uložen.";el.className="note "+(getGeoKey()?"ok":"warn");if(document.getElementById("geoKey")&&!document.getElementById("geoKey").value)document.getElementById("geoKey").value=getGeoKey()}
+function initMap(){
+ if(map||!window.L)return;
+ map=L.map("map").setView([49.8175,15.473],7);
+ const key=getGeoKey();
+ const tileUrl=key?`https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}.png?apiKey=${encodeURIComponent(key)}`:"https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+ L.tileLayer(tileUrl,{maxZoom:20,attribution:key?'Powered by <a href="https://www.geoapify.com/" target="_blank">Geoapify</a> | © OpenStreetMap contributors':'© OpenStreetMap contributors'}).addTo(map);
 }
-populate();
-initServiceDateTime();
-calculate();
-setInterval(()=>{ /* current date/time is the default only; entered time remains stable */ },60000);
-</script>
-<script>
-if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=20260812-svatky"));
+function debounceAutocomplete(which){
+ clearTimeout(autocompleteTimers[which]);
+ autocompleteTimers[which]=setTimeout(()=>loadSuggestions(which),350);
+}
+async function loadSuggestions(which){
+ const key=getGeoKey(),input=document.getElementById(which+"Address"),box=document.getElementById(which+"Suggestions"),text=input.value.trim();
+ if(!key||text.length<3){box.classList.add("hidden");return}
+ try{
+  const url=`https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(text)}&lang=cs&filter=countrycode:cz&limit=5&format=json&apiKey=${encodeURIComponent(key)}`;
+  const r=await fetch(url);if(!r.ok)throw new Error("HTTP "+r.status);const j=await r.json();
+  box.innerHTML=(j.results||[]).map((p,i)=>`<div class="suggestion" data-i="${i}">${escapeHtml(p.formatted||p.address_line1||"Adresa")}</div>`).join("");
+  box.querySelectorAll(".suggestion").forEach((el,i)=>el.onclick=()=>choosePlace(which,j.results[i]));
+  box.classList.toggle("hidden",!(j.results||[]).length);
+ }catch(e){box.classList.add("hidden");setRouteStatus("Vyhledání adresy se nepodařilo. Zkontroluj API klíč a jeho omezení.","error")}
+}
+function choosePlace(which,p){
+ const place={lat:Number(p.lat),lon:Number(p.lon),formatted:p.formatted||p.address_line1||""};
+ if(which==="from"){fromPlace=place;fromAddress.value=place.formatted}else{toPlace=place;toAddress.value=place.formatted}
+ document.getElementById(which+"Suggestions").classList.add("hidden");
+ showPlace(which,place);
+ if(fromPlace&&toPlace)calculateRoute();
+}
+function showPlace(which,p){
+ initMap();
+ const marker=which==="from"?fromMarker:toMarker;
+ if(marker)map.removeLayer(marker);
+ const m=L.marker([p.lat,p.lon]).addTo(map).bindPopup((which==="from"?"Odtah: ":"Cíl: ")+escapeHtml(p.formatted)).openPopup();
+ if(which==="from")fromMarker=m;else toMarker=m;
+ const points=[];if(fromPlace)points.push([fromPlace.lat,fromPlace.lon]);if(toPlace)points.push([toPlace.lat,toPlace.lon]);
+ if(points.length===2)map.fitBounds(points,{padding:[30,30]});else map.setView([p.lat,p.lon],15);
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function setRouteStatus(text,cls=""){routeStatus.textContent=text;routeStatus.className="mapStatus "+cls}
+function getRouteMode(){
+ const id=current().id;
+ if(id==="d")return"medium_truck";
+ return"light_truck";
+}
+async function calculateRoute(){
+ const key=getGeoKey();
+ if(!key){setRouteStatus("Nejdřív vlož Geoapify API klíč v záložce „Ceník / mapa“.","warn");showTab("settings");return}
+ if(!fromPlace||!toPlace){setRouteStatus("Vyber prosím obě adresy z nabídky.","warn");return}
+ setRouteStatus("Počítám skutečnou silniční trasu…");
+ try{
+  const waypoints=`${fromPlace.lat},${fromPlace.lon}|${toPlace.lat},${toPlace.lon}`;
+  const url=`https://api.geoapify.com/v1/routing?waypoints=${encodeURIComponent(waypoints)}&mode=${encodeURIComponent(getRouteMode())}&type=balanced&format=geojson&apiKey=${encodeURIComponent(key)}`;
+  const r=await fetch(url);if(!r.ok)throw new Error("HTTP "+r.status);const j=await r.json();
+  if(!j.features?.length)throw new Error("Trasa nebyla nalezena");
+  const feature=j.features[0],distanceM=Number(feature.properties?.distance)||0,km=Math.round(distanceM/100)/10;
+  document.getElementById("km").value=km;calculate();
+  if(routeLayer)map.removeLayer(routeLayer);
+  routeLayer=L.geoJSON(feature,{style:{weight:6,opacity:.85}}).addTo(map);
+  map.fitBounds(routeLayer.getBounds(),{padding:[25,25]});
+  const minutes=Math.round((Number(feature.properties?.time)||0)/60);
+  setRouteStatus(`Trasa: ${km.toLocaleString("cs-CZ",{maximumFractionDigits:1})} km • přibližně ${minutes} min • režim ${getRouteMode()}.`,"ok");
+ }catch(e){setRouteStatus("Výpočet trasy se nepodařil. Zkontroluj API klíč, povolené HTTP referrery a adresy.","error")}
+}
+function clearRoute(){
+ fromPlace=null;toPlace=null;fromAddress.value="";toAddress.value="";fromSuggestions.classList.add("hidden");toSuggestions.classList.add("hidden");
+ if(routeLayer){map.removeLayer(routeLayer);routeLayer=null}
+ if(fromMarker){map.removeLayer(fromMarker);fromMarker=null}if(toMarker){map.removeLayer(toMarker);toMarker=null}
+ document.getElementById("km").value=0;calculate();setRouteStatus("Mapa čeká na zadání obou adres.");
+ map.setView([49.8175,15.473],7);
+}
+function routeIfReady(){if(fromPlace&&toPlace)calculateRoute()}
+
+fromAddress.addEventListener("input",()=>debounceAutocomplete("from"));
+toAddress.addEventListener("input",()=>debounceAutocomplete("to"));
+document.addEventListener("click",e=>{if(!e.target.closest(".autocomplete")){fromSuggestions.classList.add("hidden");toSuggestions.classList.add("hidden")}});
+
+populate();initServiceDateTime();calculate();
+window.addEventListener("load",()=>setTimeout(initMap,100));
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=20260812-map"));
 </script>
 </body>
 </html>
