@@ -5,47 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b5cff">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Odtah Doplatek">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <title>Odtah – výpočet doplatku</title>
 <style>
-:root{--blue:#0b5cff;--bg:#f4f6fa;--card:#fff;--text:#172033;--muted:#687386;--line:#dfe4ec;--green:#12824c;--red:#c62828}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-header{background:var(--blue);color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:5;box-shadow:0 2px 10px #0002}
-header h1{font-size:21px;margin:0 0 3px} header p{margin:0;opacity:.9;font-size:13px}
+:root{--blue:#0b5cff;--bg:#f4f6fa;--card:#fff;--text:#172033;--muted:#687386;--line:#dfe4ec}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:var(--blue);color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:5}
+header h1{font-size:21px;margin:0 0 3px}header p{margin:0;opacity:.9;font-size:13px}
 nav{display:flex;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:73px;z-index:4}
 nav button{flex:1;border:0;background:#eef2f8;color:#344055;padding:10px;border-radius:10px;font-weight:700}
 nav button.active{background:var(--blue);color:#fff}
-main{max-width:760px;margin:auto;padding:14px 12px 40px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px #00000008}
+main{max-width:760px;margin:auto;padding:14px 12px 40px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
 h2{font-size:17px;margin:0 0 12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 label{display:block;font-size:13px;color:var(--muted);font-weight:700;margin-bottom:5px}
 input,select{width:100%;padding:12px;border:1px solid #cfd6e2;border-radius:10px;background:#fff;font-size:16px;color:var(--text)}
 .check{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #edf0f4}
 .check:last-child{border-bottom:0}.check input{width:20px;height:20px}.check label{margin:0;color:var(--text);font-size:14px}
-.result{background:#0e1728;color:#fff;border-radius:16px;padding:18px;margin-top:12px}.result .big{font-size:34px;font-weight:800;margin:5px 0 2px}.result small{opacity:.75}
+.result{background:#0e1728;color:#fff;border-radius:16px;padding:18px;margin-top:12px}.result .big{font-size:34px;font-weight:800;margin:5px 0 2px}
 .row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #ffffff20}.row:last-child{border:0}
 button.primary{width:100%;border:0;background:var(--blue);color:#fff;padding:14px;border-radius:11px;font-size:16px;font-weight:800}
 button.secondary{border:0;background:#eef2f8;padding:10px 12px;border-radius:9px;font-weight:700}
 .note{font-size:12px;color:var(--muted);line-height:1.45}.hidden{display:none}
-table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px 5px;border-bottom:1px solid var(--line);text-align:left}td input{padding:7px;font-size:14px}.money{text-align:right}
-.pill{display:inline-block;background:#e9f7ef;color:var(--green);padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}
+.pill{display:inline-block;background:#e9f7ef;color:#12824c;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}
 @media(max-width:520px){.grid{grid-template-columns:1fr}.result .big{font-size:30px}}
 </style>
 </head>
 <body>
-<header><h1>Odtah – doplatek klienta</h1><p>Výpočet podle vloženého ceníku • ceny bez DPH</p></header>
+<header><h1>Odtah – doplatek klienta</h1><p>Výpočet ceny odtahu • ceny bez DPH</p></header>
 <nav><button id="tabCalc" class="active" onclick="showTab('calc')">Výpočet</button><button id="tabSettings" onclick="showTab('settings')">Ceník</button></nav>
-
 <main>
 <section id="calc">
 <div class="card">
 <h2>1. Vozidlo a vzdálenost</h2>
 <label>Kategorie vozidla</label>
-<select id="category" onchange="renderCategoryNote(); calculate()"></select>
+<select id="category" onchange="renderCategoryNote();renderExtras();calculate()"></select>
 <div class="grid" style="margin-top:12px">
-<div><label>Vzdálenost odtahu (km)</label><input id="km" type="number" min="0" step="1" value="35" oninput="calculate()"></div>
+<div><label>Vzdálenost odtahu (km)</label><input id="km" type="number" min="0" step="1" value="0" oninput="calculate()"></div>
 <div><label>Limit klienta (Kč bez DPH)</label><input id="limit" type="number" min="0" step="1" value="1652" oninput="calculate()"></div>
 </div>
 <p id="catNote" class="note"></p>
@@ -69,135 +66,124 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px 5px;b
 
 <div class="card">
 <button class="primary" onclick="calculate()">Přepočítat</button>
-<p class="note" style="margin-bottom:0">Pravidlo vzdálenosti: do 35 km se účtuje paušál. Nad 35 km se k paušálu přičtou pouze km nad 35 × cena za km.</p>
+<p class="note" style="margin-bottom:0">Cena odtahu = počet km × cena za 1 km. Žádný paušál za odtah se nepřičítá.</p>
 </div>
 </section>
 
 <section id="settings" class="hidden">
 <div class="card">
-<h2>Ceník – lze kdykoliv změnit</h2>
-<p class="note">Hodnoty jsou předvyplněné podle vloženého ceníku. Změny se uloží do tohoto zařízení.</p>
+<h2>Ceník – ceny lze kdykoliv změnit</h2>
+<p class="note">Cena za 1 km je pro každou kategorii samostatná. Výchozí hodnota je 0 Kč, protože ji chceš doplnit podle aktuálního ceníku.</p>
 <div id="priceTables"></div>
 <button class="primary" onclick="saveSettings()">Uložit ceník</button>
 <button class="secondary" style="margin-top:8px;width:100%" onclick="resetSettings()">Obnovit výchozí ceny</button>
-</div>
-<div class="card">
-<h2>Jak je výpočet nastaven</h2>
-<p class="note">Celková cena = paušál do 35 km + (km − 35) × cena/km, pokud je km nad 35, + vybrané příplatky. Doplatek = celková cena − limit klienta. Pokud vyjde záporná částka, aplikace zobrazí přeplatek.</p>
 </div>
 </section>
 </main>
 
 <script>
-const defaultData = {
- categories: [
-  {id:"a", name:"Do 2,2 t", base:1200, km:21, extras:{manip:450, recovery:550, waiting:250}},
-  {id:"b", name:"Do 2,2 t – hydraulická ruka", base:2000, km:24, extras:{hydraulic:1200, manip:550, recovery:600, waiting:300}},
-  {id:"c", name:"2,2–3,5 t", base:1250, km:23, extras:{manip:450, recovery:550, waiting:250}},
-  {id:"d", name:"2,2–3,5 t – hydraulická ruka", base:2200, km:25, extras:{hydraulic:1400, manip:550, recovery:700, waiting:300}},
-  {id:"e", name:"2,2–3,5 t – nadrozměrné", base:1800, km:27, extras:{manip:900, recovery:900, waiting:300}}
- ],
- general: {
-  weekend:200, night:500, difficult:300, secondVehicleKm:6.5,
-  storageUnder35:150, storageOver35:50, transportPersonsKm:15
- }
-};
-let data = JSON.parse(localStorage.getItem("odtahCenik") || "null") || defaultData;
-
-const money = n => new Intl.NumberFormat("cs-CZ",{maximumFractionDigits:2}).format(n) + " Kč";
-function current(){return data.categories[+document.getElementById("category").value || 0]}
+const defaultData={
+categories:[
+{id:"a",name:"Odtah do 2,2 t",km:0,extras:{manip:450,recovery:550,waiting:250}},
+{id:"b",name:"Odtah 2,2–3,5 t",km:0,extras:{manip:450,recovery:550,waiting:250}},
+{id:"c",name:"Odtah 2,2–3,5 t – nadrozměrná vozidla",km:0,extras:{manip:900,recovery:900,waiting:300}},
+{id:"d",name:"Odtah nad 3,5–6,5 t",km:0,extras:{manip:1700,recovery:2000,waiting:500}}
+],
+general:{
+weekend:250,night:600,difficult:350,secondVehicleKm:6.5,
+storageUnder35:150,storageOver35:50,transportPersonsKm:15,
+weekendOver35:650,nightOver35:1200
+}};
+let data=JSON.parse(localStorage.getItem("odtahCenik2026")||"null")||structuredClone(defaultData);
+const money=n=>new Intl.NumberFormat("cs-CZ",{maximumFractionDigits:2}).format(n)+" Kč";
+function current(){return data.categories[+document.getElementById("category").value||0]}
 function populate(){
- const s=document.getElementById("category"); s.innerHTML="";
- data.categories.forEach((c,i)=>{let o=document.createElement("option");o.value=i;o.textContent=c.name;s.appendChild(o)});
- renderExtras(); renderSettings(); renderCategoryNote(); calculate();
+const s=document.getElementById("category");s.innerHTML="";
+data.categories.forEach((c,i)=>{let o=document.createElement("option");o.value=i;o.textContent=c.name;s.appendChild(o)});
+renderCategoryNote();renderExtras();renderSettings();calculate();
 }
 function renderCategoryNote(){
- const c=current(); document.getElementById("catNote").innerHTML =
- `<span class="pill">Paušál ${money(c.base)}</span> &nbsp; <span class="pill">${money(c.km)}/km nad 35 km</span>`;
+const c=current();
+document.getElementById("catNote").innerHTML=`<span class="pill">${money(c.km)} / km</span>`;
 }
 function renderExtras(){
- const c=current(), g=data.general;
- const list=[
-  ["manip","Naložení / složení vozidla",c.extras.manip],
-  ...(c.extras.hydraulic ? [["hydraulic","Manipulace hydraulickou rukou",c.extras.hydraulic]] : []),
-  ["recovery","Vyproštění vozidla",c.extras.recovery],
-  ["waiting","Čekací doba – 30 min",c.extras.waiting],
-  ["difficult","Ztížená manipulace",g.difficult],
-  ["weekend","Příplatek za zásah přes víkend",g.weekend],
-  ["night","Zásah ve svátek / noc",g.night]
- ];
- document.getElementById("extras").innerHTML = list.map(x=>`<div class="check"><input id="x_${x[0]}" type="checkbox" onchange="calculate()"><label for="x_${x[0]}">${x[1]} <span style="color:#687386">(${money(x[2])})</span></label></div>`).join("") +
- `<div class="grid" style="margin-top:12px">
- <div><label>Druhé vozidlo – km</label><input id="secondKm" type="number" min="0" value="0" oninput="calculate()"></div>
- <div><label>Přeprava osob – km</label><input id="personsKm" type="number" min="0" value="0" oninput="calculate()"></div>
- <div><label>Uskladnění do 3,5 t – dny</label><input id="storageU" type="number" min="0" value="0" oninput="calculate()"></div>
- <div><label>Uskladnění nad 3,5 t – dny</label><input id="storageO" type="number" min="0" value="0" oninput="calculate()"></div>
- </div>`;
+const c=current(),g=data.general;
+const list=[
+["manip","Naložení / složení vozidla",c.extras.manip],
+["recovery","Vyproštění vozidla",c.extras.recovery],
+["waiting","Čekací doba – 30 min",c.extras.waiting],
+["difficult","Příplatek za ztíženou manipulaci",g.difficult],
+["weekend","Příplatek za zásah přes víkend",g.weekend],
+["night","Příplatek za svátek / noc",g.night]
+];
+document.getElementById("extras").innerHTML=list.map(x=>`<div class="check"><input id="x_${x[0]}" type="checkbox" onchange="calculate()"><label for="x_${x[0]}">${x[1]} <span style="color:#687386">(${money(x[2])})</span></label></div>`).join("")+
+`<div class="grid" style="margin-top:12px">
+<div><label>Druhé vozidlo – km</label><input id="secondKm" type="number" min="0" value="0" oninput="calculate()"></div>
+<div><label>Přeprava osob – km</label><input id="personsKm" type="number" min="0" value="0" oninput="calculate()"></div>
+<div><label>Uskladnění do 3,5 t – dny</label><input id="storageU" type="number" min="0" value="0" oninput="calculate()"></div>
+<div><label>Uskladnění nad 3,5 t – dny</label><input id="storageO" type="number" min="0" value="0" oninput="calculate()"></div>
+</div>`;
 }
 function calculate(){
- const c=current(), km=Number(document.getElementById("km").value)||0, limit=Number(document.getElementById("limit").value)||0;
- const base=c.base + Math.max(0,km-35)*c.km;
- let ex=0;
- const g=data.general;
- const map=[["manip",c.extras.manip],["hydraulic",c.extras.hydraulic||0],["recovery",c.extras.recovery],["waiting",c.extras.waiting],["difficult",g.difficult],["weekend",g.weekend],["night",g.night]];
- map.forEach(([k,v])=>{const el=document.getElementById("x_"+k); if(el && el.checked) ex+=v});
- ex += (Number(document.getElementById("secondKm")?.value)||0)*g.secondVehicleKm;
- ex += (Number(document.getElementById("personsKm")?.value)||0)*g.transportPersonsKm;
- ex += (Number(document.getElementById("storageU")?.value)||0)*g.storageUnder35;
- ex += (Number(document.getElementById("storageO")?.value)||0)*g.storageOver35;
- const total=base+ex, diff=total-limit;
- document.getElementById("baseOut").textContent=money(base);
- document.getElementById("extrasOut").textContent=money(ex);
- document.getElementById("totalOut").textContent=money(total);
- document.getElementById("limitOut").textContent=money(limit);
- document.getElementById("resultOut").textContent=money(Math.abs(diff));
- document.getElementById("resultLabel").textContent=diff>=0 ? "Klient má doplatit." : "Klient má přeplatek.";
+const c=current(),km=Number(document.getElementById("km").value)||0,limit=Number(document.getElementById("limit").value)||0;
+const base=km*c.km;let ex=0,g=data.general;
+[["manip",c.extras.manip],["recovery",c.extras.recovery],["waiting",c.extras.waiting],["difficult",g.difficult],["weekend",g.weekend],["night",g.night]].forEach(([k,v])=>{let el=document.getElementById("x_"+k);if(el&&el.checked)ex+=v});
+ex+=(Number(document.getElementById("secondKm")?.value)||0)*g.secondVehicleKm;
+ex+=(Number(document.getElementById("personsKm")?.value)||0)*g.transportPersonsKm;
+ex+=(Number(document.getElementById("storageU")?.value)||0)*g.storageUnder35;
+ex+=(Number(document.getElementById("storageO")?.value)||0)*g.storageOver35;
+const total=base+ex,diff=total-limit;
+document.getElementById("baseOut").textContent=money(base);
+document.getElementById("extrasOut").textContent=money(ex);
+document.getElementById("totalOut").textContent=money(total);
+document.getElementById("limitOut").textContent=money(limit);
+document.getElementById("resultOut").textContent=money(Math.abs(diff));
+document.getElementById("resultLabel").textContent=diff>=0?"Klient má doplatit.":"Klient má přeplatek.";
 }
 function renderSettings(){
- let h="";
- data.categories.forEach((c,i)=>{h+=`<div class="card" style="box-shadow:none;border-style:dashed"><h2>${c.name}</h2><div class="grid">
- <div><label>Paušál do 35 km</label><input data-path="c.${i}.base" value="${c.base}" type="number"></div>
- <div><label>Cena za 1 km nad 35 km</label><input data-path="c.${i}.km" value="${c.km}" type="number" step="0.01"></div>
- <div><label>Naložení / složení</label><input data-path="c.${i}.extras.manip" value="${c.extras.manip}" type="number"></div>
- <div><label>Vyproštění</label><input data-path="c.${i}.extras.recovery" value="${c.extras.recovery}" type="number"></div>
- <div><label>Čekání 30 min</label><input data-path="c.${i}.extras.waiting" value="${c.extras.waiting}" type="number"></div>
- ${c.extras.hydraulic!==undefined?`<div><label>Hydraulická manipulace</label><input data-path="c.${i}.extras.hydraulic" value="${c.extras.hydraulic}" type="number"></div>`:""}
- </div></div>`});
- h+=`<div class="card" style="box-shadow:none;border-style:dashed"><h2>Ostatní služby</h2><div class="grid">
- ${setting("Víkend", "general.weekend",data.general.weekend)}
- ${setting("Noc / svátek", "general.night",data.general.night)}
- ${setting("Ztížená manipulace", "general.difficult",data.general.difficult)}
- ${setting("Druhé vozidlo – Kč/km", "general.secondVehicleKm",data.general.secondVehicleKm)}
- ${setting("Uskladnění do 3,5 t – Kč/den", "general.storageUnder35",data.general.storageUnder35)}
- ${setting("Uskladnění nad 3,5 t – Kč/den", "general.storageOver35",data.general.storageOver35)}
- ${setting("Přeprava osob – Kč/km", "general.transportPersonsKm",data.general.transportPersonsKm)}
- </div></div>`;
- document.getElementById("priceTables").innerHTML=h;
+let h="";
+data.categories.forEach((c,i)=>{h+=`<div class="card" style="box-shadow:none;border-style:dashed"><h2>${c.name}</h2><div class="grid">
+<div><label>Cena za 1 km odtahu</label><input data-path="c.${i}.km" value="${c.km}" type="number" step="0.01" min="0"></div>
+<div><label>Naložení / složení</label><input data-path="c.${i}.extras.manip" value="${c.extras.manip}" type="number" step="0.01"></div>
+<div><label>Vyproštění</label><input data-path="c.${i}.extras.recovery" value="${c.extras.recovery}" type="number" step="0.01"></div>
+<div><label>Čekání 30 min</label><input data-path="c.${i}.extras.waiting" value="${c.extras.waiting}" type="number" step="0.01"></div>
+</div></div>`});
+h+=`<div class="card" style="box-shadow:none;border-style:dashed"><h2>Ostatní služby</h2><div class="grid">
+${setting("Víkend","general.weekend",g().weekend)}
+${setting("Noc / svátek","general.night",g().night)}
+${setting("Ztížená manipulace","general.difficult",g().difficult)}
+${setting("Druhé vozidlo – Kč/km","general.secondVehicleKm",g().secondVehicleKm)}
+${setting("Uskladnění do 3,5 t – Kč/den","general.storageUnder35",g().storageUnder35)}
+${setting("Uskladnění nad 3,5 t – Kč/den","general.storageOver35",g().storageOver35)}
+${setting("Přeprava osob – Kč/km","general.transportPersonsKm",g().transportPersonsKm)}
+</div></div>`;
+document.getElementById("priceTables").innerHTML=h;
 }
+function g(){return data.general}
 function setting(label,path,value){return `<div><label>${label}</label><input data-path="${path}" value="${value}" type="number" step="0.01"></div>`}
-function saveSettings(){
- document.querySelectorAll("#settings input[data-path]").forEach(el=>{
-  const p=el.dataset.path.split("."), v=Number(el.value)||0;
-  if(p[0]==="c"){data.categories[+p[1]][p[2]][p[3]]=v;}
-  else data.general[p[1]]=v;
- });
- localStorage.setItem("odtahCenik",JSON.stringify(data)); populate(); showTab("calc");
- alert("Ceník byl uložen.");
+function setPath(path,v){
+const p=path.split(".");
+if(p[0]==="c"){
+let c=data.categories[+p[1]];
+if(p[2]==="km")c.km=v;else c.extras[p[3]]=v;
+}else data.general[p[1]]=v;
 }
-function resetSettings(){if(confirm("Obnovit výchozí ceny z vloženého ceníku?")){data=JSON.parse(JSON.stringify(defaultData));localStorage.setItem("odtahCenik",JSON.stringify(data));populate();}}
+function saveSettings(){
+document.querySelectorAll("#settings input[data-path]").forEach(el=>setPath(el.dataset.path,Number(el.value)||0));
+localStorage.setItem("odtahCenik2026",JSON.stringify(data));populate();showTab("calc");alert("Ceník byl uložen.");
+}
+function resetSettings(){if(confirm("Obnovit výchozí ceny?")){data=structuredClone(defaultData);localStorage.setItem("odtahCenik2026",JSON.stringify(data));populate();}}
 function showTab(t){
- document.getElementById("calc").classList.toggle("hidden",t!=="calc");
- document.getElementById("settings").classList.toggle("hidden",t!=="settings");
- document.getElementById("tabCalc").classList.toggle("active",t==="calc");
- document.getElementById("tabSettings").classList.toggle("active",t==="settings");
- if(t==="settings") renderSettings();
+document.getElementById("calc").classList.toggle("hidden",t!=="calc");
+document.getElementById("settings").classList.toggle("hidden",t!=="settings");
+document.getElementById("tabCalc").classList.toggle("active",t==="calc");
+document.getElementById("tabSettings").classList.toggle("active",t==="settings");
+if(t==="settings")renderSettings();
 }
 populate();
 </script>
 <script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
-}
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=20260812"));
 </script>
 </body>
 </html>
