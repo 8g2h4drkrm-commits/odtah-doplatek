@@ -38,10 +38,109 @@ button.secondary{border:0;background:#eef2f8;padding:10px 12px;border-radius:9px
 .mapStatus{margin-top:10px;font-size:13px;font-weight:700}.ok{color:var(--ok)}.warn{color:var(--warn)}.error{color:#c62828}
 .smallButton{border:0;background:#eef2f8;padding:8px 10px;border-radius:8px;font-weight:700}
 @media(max-width:520px){.grid{grid-template-columns:1fr}.result .big{font-size:30px}#map{height:290px}}
+
+/* ===== Kompaktní mobilní vzhled v2 ===== */
+:root{
+  --blue:#1764ff;--blue2:#0b4fd9;--bg:#f3f6fb;--card:#fff;
+  --text:#18243a;--muted:#6d7a90;--line:#dce4ef;--soft:#f5f8fc;
+  --ok:#138a52;--warn:#b36b00
+}
+body{background:var(--bg);font-size:15px}
+header{
+  background:linear-gradient(135deg,var(--blue2),var(--blue));
+  padding:13px 14px 12px;box-shadow:0 2px 12px #102b5a18
+}
+header h1{font-size:19px;line-height:1.15;margin:0 0 2px}
+header p{font-size:12px}
+nav{
+  top:61px;padding:7px 10px;background:#fff;border-bottom:1px solid var(--line);
+  box-shadow:0 2px 10px #102b5a0d
+}
+nav button{padding:9px 8px;border-radius:10px;font-size:14px}
+main{max-width:900px;padding:9px 9px 28px}
+.card{
+  border-radius:13px;padding:12px;margin-bottom:9px;
+  box-shadow:0 2px 10px #17345d0a
+}
+#calc>.card h2{
+  display:flex;align-items:center;gap:7px;font-size:16px;margin:0 0 9px;color:#174b9e
+}
+#calc>.card h2::before{
+  content:"";width:6px;height:19px;border-radius:4px;background:var(--blue);display:inline-block
+}
+label{font-size:12px;margin-bottom:4px}
+input,select{padding:10px 11px;border-radius:9px;font-size:15px;min-height:42px}
+.grid{gap:8px}
+button.primary{padding:11px 12px;border-radius:9px;font-size:15px;min-height:42px}
+button.secondary{padding:10px 12px;border-radius:9px;font-size:14px;min-height:42px}
+.note{font-size:11.5px;line-height:1.35;margin:6px 0}
+.pill{padding:4px 7px;font-size:11px}
+.autocomplete{position:relative}
+.suggestions{border-radius:9px;box-shadow:0 10px 28px #10233a22}
+.suggestion{padding:10px;font-size:13px}
+#map{height:250px;border-radius:11px;margin-top:9px}
+.mapStatus{
+  background:var(--soft);border:1px solid var(--line);border-radius:9px;
+  padding:8px 9px;margin-top:8px;font-size:12px
+}
+#autoSurcharges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+#autoSurcharges .check{margin:0}
+.check{
+  background:var(--soft);border:1px solid var(--line)!important;
+  border-radius:9px;padding:9px 10px;margin-bottom:6px;min-height:44px
+}
+.check:last-child{margin-bottom:0}
+.check input{width:18px;height:18px;min-height:18px}
+.check label{font-size:12px}
+#extras{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+#extras>.check{margin:0}
+#extras>.grid{grid-column:1/-1}
+#extras .grid{margin-top:2px!important}
+.result{
+  background:#fff;color:var(--text);border:1px solid var(--line);
+  border-radius:12px;padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:5px
+}
+.result .row{
+  background:var(--soft);border:1px solid var(--line)!important;border-radius:9px;
+  padding:8px 9px;display:flex;flex-direction:column;gap:2px;font-size:12px
+}
+.result .row b{font-size:16px;color:#174b9e}
+.result>div:last-child{
+  grid-column:1/-1;background:#f0f5ff;border:1px solid #cfe0ff;
+  border-radius:10px;padding:10px;text-align:center
+}
+.result .big{font-size:28px;color:var(--blue);line-height:1.05;margin:3px 0}
+#resultLabel{font-size:11px;color:var(--muted)}
+.card:has(#map) .grid{align-items:end}
+#settings .card{padding:12px}
+#settings .card h2{font-size:16px;margin-bottom:8px}
+#settings .card .card{margin-bottom:7px;padding:10px}
+@media(max-width:600px){
+  #autoSurcharges{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  main{padding:7px 7px 24px}
+  .card{padding:10px;margin-bottom:7px}
+  .grid{grid-template-columns:1fr}
+  #extras{grid-template-columns:1fr}
+  #extras>.grid{grid-template-columns:1fr 1fr}
+  #map{height:230px}
+  .result{grid-template-columns:1fr 1fr}
+  .result .row{padding:7px}
+  .result .row b{font-size:15px}
+  .result .big{font-size:26px}
+  nav{top:58px}
+}
+@media(max-width:380px){
+  #extras>.grid{grid-template-columns:1fr}
+  .result{grid-template-columns:1fr}
+  .result>div:last-child{grid-column:1}
+}
+
 </style>
 </head>
 <body>
-<header><h1>Odtah – doplatek klienta</h1><p>Výpočet ceny odtahu • ceny bez DPH</p></header>
+<header><h1>🚚 Odtah – doplatek klienta</h1><p>Výpočet ceny odtahu • ceny bez DPH</p></header>
 <nav><button id="tabCalc" class="active" onclick="showTab('calc')">Výpočet</button><button id="tabSettings" onclick="showTab('settings')">Ceník / mapa</button></nav>
 
 <main>
@@ -59,14 +158,14 @@ button.secondary{border:0;background:#eef2f8;padding:10px 12px;border-radius:9px
 
 <div class="card">
 <h2>2. Mapa a adresa odtahu</h2>
-<p class="note">Začni psát ulici, číslo nebo město a vyber adresu z nabídky, nebo použij tlačítko 📍 Moje poloha. Potom zadej cíl. Aplikace spočítá skutečnou silniční vzdálenost a vloží ji do kalkulace.</p>
+<p class="note">Začni psát ulici, číslo nebo město a vyber adresu z nabídky. Nebo použij 📍 Moje poloha. Potom zadej cíl.</p>
 
 <div class="autocomplete">
 <label>Místo zásahu / naložení</label>
 <input id="fromAddress" autocomplete="off" placeholder="Např. Hlavní 12, Brno">
 <div id="fromSuggestions" class="suggestions hidden"></div>
-<button type="button" class="secondary" style="width:100%;margin-top:8px" onclick="useMyLocation()">📍 Moje poloha</button>
-<div id="locationStatus" class="note" style="margin-top:7px"></div>
+<button type="button" class="secondary" style="width:100%;margin-top:6px" onclick="useMyLocation()">📍 Moje poloha</button>
+<div id="locationStatus" class="note" style="margin-top:5px"></div>
 </div>
 
 <div class="autocomplete" style="margin-top:12px">
@@ -301,46 +400,33 @@ function getRouteMode(){
  return"light_truck";
 }
 
-async function useMyLocation(){
-  const key=getGeoKey();
-  const status=document.getElementById("locationStatus");
-  if(!navigator.geolocation){
-    status.textContent="Tento iPhone nepodporuje zjištění polohy.";
-    status.className="note error"; return;
+function useMyLocation(){
+ const key=getGeoKey(),status=document.getElementById("locationStatus");
+ if(!navigator.geolocation){status.textContent="Tento iPhone nepodporuje zjištění polohy.";status.className="note error";return}
+ if(!key){status.textContent="Nejdřív vlož Geoapify API klíč v záložce „Ceník / mapa“.";status.className="note warn";showTab("settings");return}
+ status.textContent="📍 Zjišťuji tvoji polohu…";status.className="note";
+ navigator.geolocation.getCurrentPosition(async pos=>{
+  const lat=pos.coords.latitude,lon=pos.coords.longitude;
+  try{
+   const url=`https://api.geoapify.com/v1/geocode/reverse?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&lang=cs&format=json&apiKey=${encodeURIComponent(key)}`;
+   const r=await fetch(url);if(!r.ok)throw new Error("HTTP "+r.status);
+   const j=await r.json(),p=j.results?.[0];if(!p)throw new Error("No address");
+   const place={lat,lon,formatted:p.formatted||p.address_line1||`${lat.toFixed(5)}, ${lon.toFixed(5)}`};
+   fromPlace=place;fromAddress.value=place.formatted;showPlace("from",place);
+   status.textContent="📍 "+place.formatted;status.className="note ok";
+   if(toPlace)calculateRoute();
+  }catch(e){
+   const place={lat,lon,formatted:`GPS ${lat.toFixed(5)}, ${lon.toFixed(5)}`};
+   fromPlace=place;fromAddress.value=place.formatted;showPlace("from",place);
+   status.textContent="GPS poloha nalezena, adresu se nepodařilo určit.";status.className="note warn";
   }
-  if(!key){
-    status.textContent="Nejdřív vlož Geoapify API klíč v záložce „Ceník / mapa“.";
-    status.className="note warn"; showTab("settings"); return;
-  }
-  status.textContent="📍 Zjišťuji tvoji polohu…"; status.className="note";
-  navigator.geolocation.getCurrentPosition(async pos=>{
-    const lat=pos.coords.latitude, lon=pos.coords.longitude;
-    try{
-      const url=`https://api.geoapify.com/v1/geocode/reverse?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&lang=cs&format=json&apiKey=${encodeURIComponent(key)}`;
-      const r=await fetch(url); if(!r.ok) throw new Error("HTTP "+r.status);
-      const j=await r.json(), p=j.results?.[0];
-      if(!p) throw new Error("Adresa nebyla nalezena");
-      const place={lat,lon,formatted:p.formatted||p.address_line1||`${lat.toFixed(5)}, ${lon.toFixed(5)}`};
-      fromPlace=place;
-      document.getElementById("fromAddress").value=place.formatted;
-      showPlace("from",place);
-      status.textContent=`📍 Poloha nalezena: ${place.formatted}`;
-      status.className="note ok";
-      if(toPlace) calculateRoute();
-    }catch(e){
-      const place={lat,lon,formatted:`GPS ${lat.toFixed(5)}, ${lon.toFixed(5)}`};
-      fromPlace=place; document.getElementById("fromAddress").value=place.formatted;
-      showPlace("from",place);
-      status.textContent="GPS poloha nalezena, ale adresu se nepodařilo určit. Můžeš pokračovat přes GPS.";
-      status.className="note warn";
-    }
-  },err=>{
-    let msg="Poloha nebyla zjištěna.";
-    if(err.code===1) msg="Přístup k poloze byl zamítnut. Na iPhonu povol polohu pro Safari.";
-    if(err.code===2) msg="Poloha momentálně není dostupná.";
-    if(err.code===3) msg="Zjištění polohy trvalo příliš dlouho. Zkus to znovu.";
-    status.textContent="📍 "+msg; status.className="note error";
-  },{enableHighAccuracy:true,timeout:15000,maximumAge:30000});
+ },err=>{
+  let msg="Poloha nebyla zjištěna.";
+  if(err.code===1)msg="Přístup k poloze byl zamítnut. Povol polohu pro Safari.";
+  if(err.code===2)msg="Poloha momentálně není dostupná.";
+  if(err.code===3)msg="Zjištění polohy trvalo příliš dlouho. Zkus to znovu.";
+  status.textContent="📍 "+msg;status.className="note error";
+ },{enableHighAccuracy:true,timeout:15000,maximumAge:30000});
 }
 
 async function calculateRoute(){
