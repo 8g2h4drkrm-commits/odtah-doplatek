@@ -11,145 +11,92 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <title>Odtah – doplatek klienta</title>
 <style>
-:root{--blue:#0b5cff;--bg:#f4f6fa;--card:#fff;--text:#172033;--muted:#687386;--line:#dfe4ec;--ok:#12824c;--warn:#b36b00}
+:root{--blue:#1764ff;--blue2:#0b4fd9;--bg:#eef2f7;--card:#fff;--text:#18243a;--muted:#6d7a90;--line:#dce4ef;--soft:#f5f8fc;--ok:#138a52;--warn:#b36b00}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-header{background:var(--blue);color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1000}
-header h1{font-size:21px;margin:0 0 3px}header p{margin:0;opacity:.9;font-size:13px}
-nav{display:flex;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:73px;z-index:999}
-nav button{flex:1;border:0;background:#eef2f8;color:#344055;padding:10px;border-radius:10px;font-weight:700}
-nav button.active{background:var(--blue);color:#fff}
-main{max-width:760px;margin:auto;padding:14px 12px 40px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
-h2{font-size:17px;margin:0 0 12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-label{display:block;font-size:13px;color:var(--muted);font-weight:700;margin-bottom:5px}
-input,select{width:100%;padding:12px;border:1px solid #cfd6e2;border-radius:10px;background:#fff;font-size:16px;color:var(--text)}
-button.primary{width:100%;border:0;background:var(--blue);color:#fff;padding:14px;border-radius:11px;font-size:16px;font-weight:800}
-button.secondary{border:0;background:#eef2f8;padding:10px 12px;border-radius:9px;font-weight:700}
-.note{font-size:12px;color:var(--muted);line-height:1.45}.hidden{display:none}
-.pill{display:inline-block;background:#e9f7ef;color:var(--ok);padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}
-.check{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #edf0f4}
-.check:last-child{border-bottom:0}.check input{width:20px;height:20px}.check label{margin:0;color:var(--text);font-size:14px}
-.result{background:#0e1728;color:#fff;border-radius:16px;padding:18px;margin-top:12px}.result .big{font-size:34px;font-weight:800;margin:5px 0 2px}
-.row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #ffffff20}.row:last-child{border:0}
-.autocomplete{position:relative}.suggestions{position:absolute;left:0;right:0;top:100%;z-index:2000;background:#fff;border:1px solid #cfd6e2;border-radius:10px;box-shadow:0 8px 25px #0002;overflow:hidden}
-.suggestion{padding:12px;border-bottom:1px solid #edf0f4;font-size:14px;cursor:pointer}.suggestion:last-child{border-bottom:0}.suggestion:hover{background:#f2f5fa}
-#map{height:330px;border-radius:14px;border:1px solid var(--line);margin-top:12px;overflow:hidden}
-.mapStatus{margin-top:10px;font-size:13px;font-weight:700}.ok{color:var(--ok)}.warn{color:var(--warn)}.error{color:#c62828}
-.smallButton{border:0;background:#eef2f8;padding:8px 10px;border-radius:8px;font-weight:700}
-@media(max-width:520px){.grid{grid-template-columns:1fr}.result .big{font-size:30px}#map{height:290px}}
-
-/* ===== Kompaktní mobilní vzhled v2 ===== */
-:root{
-  --blue:#1764ff;--blue2:#0b4fd9;--bg:#f3f6fb;--card:#fff;
-  --text:#18243a;--muted:#6d7a90;--line:#dce4ef;--soft:#f5f8fc;
-  --ok:#138a52;--warn:#b36b00
-}
-body{background:var(--bg);font-size:15px}
-header{
-  background:linear-gradient(135deg,var(--blue2),var(--blue));
-  padding:13px 14px 12px;box-shadow:0 2px 12px #102b5a18
-}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:16px;-webkit-tap-highlight-color:transparent}
+header{background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;padding:11px 14px 10px;position:sticky;top:0;z-index:1000;box-shadow:0 2px 12px #102b5a18}
 header h1{font-size:19px;line-height:1.15;margin:0 0 2px}
-header p{font-size:12px}
-nav{
-  top:61px;padding:7px 10px;background:#fff;border-bottom:1px solid var(--line);
-  box-shadow:0 2px 10px #102b5a0d
-}
-nav button{padding:9px 8px;border-radius:10px;font-size:14px}
-main{max-width:900px;padding:9px 9px 28px}
-.card{
-  border-radius:13px;padding:12px;margin-bottom:9px;
-  box-shadow:0 2px 10px #17345d0a
-}
-#calc>.card h2{
-  display:flex;align-items:center;gap:7px;font-size:16px;margin:0 0 9px;color:#174b9e
-}
-#calc>.card h2::before{
-  content:"";width:6px;height:19px;border-radius:4px;background:var(--blue);display:inline-block
-}
-label{font-size:12px;margin-bottom:4px}
-input,select{padding:10px 11px;border-radius:9px;font-size:15px;min-height:42px}
-.grid{gap:8px}
-button.primary{padding:11px 12px;border-radius:9px;font-size:15px;min-height:42px}
-button.secondary{padding:10px 12px;border-radius:9px;font-size:14px;min-height:42px}
-.note{font-size:11.5px;line-height:1.35;margin:6px 0}
-.pill{padding:4px 7px;font-size:11px}
-.autocomplete{position:relative}
-.suggestions{border-radius:9px;box-shadow:0 10px 28px #10233a22}
-.suggestion{padding:10px;font-size:13px}
-#map{height:250px;border-radius:11px;margin-top:9px}
-.mapStatus{
-  background:var(--soft);border:1px solid var(--line);border-radius:9px;
-  padding:8px 9px;margin-top:8px;font-size:12px
-}
-#autoSurcharges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-#autoSurcharges .check{margin:0}
-.check{
-  background:var(--soft);border:1px solid var(--line)!important;
-  border-radius:9px;padding:9px 10px;margin-bottom:6px;min-height:44px
-}
+header p{margin:0;opacity:.9;font-size:12px}
+nav{display:flex;gap:6px;padding:6px 8px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:57px;z-index:999;box-shadow:0 2px 10px #102b5a0d}
+nav button{flex:1;border:0;background:#eef2f8;color:#344055;padding:9px 8px;min-height:44px;border-radius:10px;font-weight:800;font-size:15px}
+nav button.active{background:var(--blue);color:#fff}
+main{max-width:900px;margin:auto;padding:7px 7px 90px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:11px;margin-bottom:7px;box-shadow:0 1px 7px #142d5512}
+h2{font-size:17px;margin:0 0 9px}
+#calc>.card h2{display:flex;align-items:center;gap:7px;color:#174b9e}
+#calc>.card h2::before{content:"";width:6px;height:19px;border-radius:4px;background:var(--blue);display:inline-block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+label{display:block;font-size:13px;color:var(--muted);font-weight:800;margin-bottom:4px}
+input,select{width:100%;padding:11px 12px;min-height:48px;border:1px solid #cfd6e2;border-radius:10px;background:#fff;font-size:17px;color:var(--text)}
+input:focus,select:focus{outline:3px solid #1764ff33;border-color:#72a0ff}
+button.primary{width:100%;border:0;background:var(--blue);color:#fff;padding:11px 12px;min-height:48px;border-radius:10px;font-size:16px;font-weight:900;box-shadow:0 2px 5px #1764ff2e}
+button.secondary{border:0;background:#eef2f8;color:#344055;padding:10px 12px;min-height:48px;border-radius:10px;font-weight:800;font-size:16px}
+.note{font-size:11.5px;color:var(--muted);line-height:1.3;margin:6px 0}
+.hidden{display:none}
+.pill{display:inline-block;background:#e9f7ef;color:var(--ok);padding:4px 7px;border-radius:999px;font-size:11px;font-weight:900}
+.check{display:flex;align-items:center;gap:9px;padding:8px 9px;border:1px solid var(--line)!important;background:var(--soft);border-radius:9px;margin-bottom:6px;min-height:50px}
 .check:last-child{margin-bottom:0}
 .check input{width:18px;height:18px;min-height:18px}
-.check label{font-size:12px}
-#extras{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-#extras>.check{margin:0}
-#extras>.grid{grid-column:1/-1}
-#extras .grid{margin-top:2px!important}
-.result{
-  background:#fff;color:var(--text);border:1px solid var(--line);
-  border-radius:12px;padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:5px
-}
-.result .row{
-  background:var(--soft);border:1px solid var(--line)!important;border-radius:9px;
-  padding:8px 9px;display:flex;flex-direction:column;gap:2px;font-size:12px
-}
-.result .row b{font-size:16px;color:#174b9e}
-.result>div:last-child{
-  grid-column:1/-1;background:#f0f5ff;border:1px solid #cfe0ff;
-  border-radius:10px;padding:10px;text-align:center
-}
-.result .big{font-size:28px;color:var(--blue);line-height:1.05;margin:3px 0}
-#resultLabel{font-size:11px;color:var(--muted)}
-.card:has(#map) .grid{align-items:end}
-#settings .card{padding:12px}
-#settings .card h2{font-size:16px;margin-bottom:8px}
-#settings .card .card{margin-bottom:7px;padding:10px}
-@media(max-width:600px){
-  #autoSurcharges{grid-template-columns:1fr}
-}
+.check label{margin:0;color:var(--text);font-size:13px}
+.result{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:7px;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
+.result .row{background:var(--soft);border:1px solid var(--line)!important;border-radius:9px;padding:8px 9px;display:flex;flex-direction:column;justify-content:center;gap:2px;min-height:54px;font-size:12px}
+.result .row b{font-size:17px;color:#174b9e}
+.result>div:last-child{grid-column:1/-1;background:#f0f5ff;border:1px solid #cfe0ff;border-radius:10px;padding:12px 8px;text-align:center}
+.result .big{font-size:34px;font-weight:900;color:var(--blue);line-height:1.05;margin:3px 0}
+.autocomplete{position:relative}
+.suggestions{position:absolute;left:0;right:0;top:100%;z-index:2000;background:#fff;border:1px solid #cfd6e2;border-radius:10px;box-shadow:0 10px 28px #10233a22;overflow:hidden}
+.suggestion{padding:12px;border-bottom:1px solid #edf0f4;font-size:14px;cursor:pointer}
+.suggestion:last-child{border-bottom:0}
+#map{height:205px;border-radius:11px;border:1px solid var(--line);margin-top:8px;overflow:hidden}
+.mapStatus{margin-top:8px;background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:8px 9px;font-size:13px;font-weight:800}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.error{color:#c62828}
+#autoSurcharges{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+#autoSurcharges .check{margin:0;min-height:42px;padding:7px 8px}
+#extras{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#extras .check{margin:0}
+#extras>.grid{grid-column:1/-1;margin-top:2px!important}
+#driverQuick{position:sticky;top:105px;z-index:900;display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin:0 0 7px;padding:5px;background:#fffffff5;border:1px solid var(--line);border-radius:12px;box-shadow:0 2px 12px #142d551a;backdrop-filter:blur(8px)}
+#driverQuick button{min-height:43px;border:0;border-radius:9px;background:#eef3fb;color:#173f86;font-size:13px;font-weight:900}
+#driverQuick button:last-child{background:var(--blue);color:#fff}
+#driverQuick button:active{transform:scale(.98)}
+#driverQuick button[aria-current="true"]{outline:3px solid #1764ff33}
+#calc>.card:first-of-type .grid{grid-template-columns:1fr 1fr}
+button[onclick="useMyLocation()"]{width:100%;margin-top:6px;background:#e7f0ff;color:#0759d9;border:2px solid #bcd3ff;min-height:52px;font-size:17px;font-weight:900}
+button[onclick="calculateRoute()"]{min-height:54px;font-size:17px;font-weight:900}
+#locationStatus{min-height:16px}
+@media(max-width:600px){#autoSurcharges{grid-template-columns:1fr}}
 @media(max-width:520px){
-  main{padding:7px 7px 24px}
-  .card{padding:10px;margin-bottom:7px}
-  .grid{grid-template-columns:1fr}
-  #extras{grid-template-columns:1fr}
-  #extras>.grid{grid-template-columns:1fr 1fr}
-  #map{height:230px}
-  .result{grid-template-columns:1fr 1fr}
-  .result .row{padding:7px}
-  .result .row b{font-size:15px}
-  .result .big{font-size:26px}
-  nav{top:58px}
+ main{padding:6px 6px 88px}.card{padding:10px}
+ #calc>.card:first-of-type .grid{grid-template-columns:1fr 1fr}
+ #extras{grid-template-columns:1fr}
+ #extras>.grid{grid-template-columns:1fr 1fr}
+ #map{height:205px}.result{grid-template-columns:1fr 1fr}
+ #driverQuick{top:104px}
 }
 @media(max-width:380px){
-  #extras>.grid{grid-template-columns:1fr}
-  .result{grid-template-columns:1fr}
-  .result>div:last-child{grid-column:1}
+ #calc>.card:first-of-type .grid,#extras>.grid,.result{grid-template-columns:1fr}
+ #driverQuick button{font-size:12px;padding:5px 3px}
 }
-
 </style>
 </head>
 <body>
-<header><h1>🚚 Odtah – doplatek klienta</h1><p>Výpočet ceny odtahu • ceny bez DPH</p></header>
+<header><h1>🚚 Odtah – doplatek klienta</h1><p>Rychlý výpočet doplatku při zásahu</p></header>
 <nav><button id="tabCalc" class="active" onclick="showTab('calc')">Výpočet</button><button id="tabSettings" onclick="showTab('settings')">Ceník / mapa</button></nav>
 
 <main>
 <section id="calc">
+<div id="driverQuick">
+<button type="button" data-go="location">📍 Poloha</button>
+<button type="button" data-go="target">🎯 Cíl</button>
+<button type="button" data-go="result">💰 Doplatek</button>
+</div>
+
 <div class="card">
 <h2>1. Vozidlo a vzdálenost</h2>
 <label>Kategorie vozidla</label>
 <select id="category" onchange="renderCategoryNote();renderExtras();calculate();routeIfReady()"></select>
-<div class="grid" style="margin-top:12px">
+<div class="grid" style="margin-top:8px">
 <div><label>Vzdálenost odtahu (km)</label><input id="km" type="number" min="0" step="0.1" value="0" oninput="calculate()"></div>
 <div><label>Limit klienta (Kč bez DPH)</label><input id="limit" type="number" min="0" step="1" value="1652" oninput="calculate()"></div>
 </div>
@@ -158,25 +105,25 @@ button.secondary{padding:10px 12px;border-radius:9px;font-size:14px;min-height:4
 
 <div class="card">
 <h2>2. Mapa a adresa odtahu</h2>
-<p class="note">Začni psát ulici, číslo nebo město a vyber adresu z nabídky. Nebo použij 📍 Moje poloha. Potom zadej cíl.</p>
+<p class="note">Nejrychlejší postup: použij polohu, vyber cíl a spočítej trasu.</p>
 
 <div class="autocomplete">
 <label>Místo zásahu / naložení</label>
 <input id="fromAddress" autocomplete="off" placeholder="Např. Hlavní 12, Brno">
 <div id="fromSuggestions" class="suggestions hidden"></div>
-<button type="button" class="secondary" style="width:100%;margin-top:6px" onclick="useMyLocation()">📍 Moje poloha</button>
-<div id="locationStatus" class="note" style="margin-top:5px"></div>
+<button type="button" class="secondary" onclick="useMyLocation()">📍 MOJE POLOHA</button>
+<div id="locationStatus" class="note"></div>
 </div>
 
-<div class="autocomplete" style="margin-top:12px">
+<div class="autocomplete" style="margin-top:10px">
 <label>Cíl odtahu</label>
 <input id="toAddress" autocomplete="off" placeholder="Např. Vídeňská 25, Brno">
 <div id="toSuggestions" class="suggestions hidden"></div>
 </div>
 
-<div class="grid" style="margin-top:12px">
-<button class="primary" onclick="calculateRoute()">Spočítat trasu a km</button>
-<button class="secondary" onclick="clearRoute()">Vymazat trasu</button>
+<div class="grid" style="margin-top:9px">
+<button class="primary" onclick="calculateRoute()">🗺️ VYPOČÍTAT TRASU</button>
+<button class="secondary" onclick="clearRoute()">Vymazat</button>
 </div>
 
 <div id="routeStatus" class="mapStatus">Mapa čeká na zadání obou adres.</div>
@@ -184,52 +131,52 @@ button.secondary{padding:10px 12px;border-radius:9px;font-size:14px;min-height:4
 </div>
 
 <div class="card">
-<h2>3. Datum a čas zásahu</h2>
-<p class="note">Příplatky za víkend, noc a svátek se určují automaticky podle zadaného data a času zásahu. Výchozí hodnota je aktuální čas iPhonu.</p>
-<div class="grid">
-<div><label>Datum zásahu</label><input id="serviceDate" type="date" onchange="calculate()"></div>
-<div><label>Čas zásahu</label><input id="serviceTime" type="time" onchange="calculate()"></div>
-</div>
-<div id="autoSurcharges" style="margin-top:12px"></div>
-</div>
-
-<div class="card">
-<h2>4. Příplatky / služby</h2>
-<div id="extras"></div>
-</div>
-
-<div class="card">
-<h2>5. Výsledek</h2>
+<h2>3. Výsledek doplatku</h2>
 <div class="result">
 <div class="row"><span>Odtah</span><b id="baseOut">0 Kč</b></div>
 <div class="row"><span>Příplatky</span><b id="extrasOut">0 Kč</b></div>
 <div class="row"><span>Celková cena</span><b id="totalOut">0 Kč</b></div>
 <div class="row"><span>Limit klienta</span><b id="limitOut">0 Kč</b></div>
-<div style="margin-top:10px"><small>DOPLATEK / PŘEPLATEK</small><div class="big" id="resultOut">0 Kč</div><small id="resultLabel"></small></div>
+<div><small>DOPLATEK / PŘEPLATEK</small><div class="big" id="resultOut">0 Kč</div><small id="resultLabel"></small></div>
 </div>
 </div>
 
 <div class="card">
-<button class="primary" onclick="calculate()">Přepočítat</button>
-<p class="note" style="margin-bottom:0">Cena odtahu = počet km × cena za 1 km. Silniční vzdálenost z mapy se automaticky zapíše do pole vzdálenosti.</p>
+<h2>4. Datum a čas zásahu</h2>
+<p class="note">Příplatky za víkend, noc a svátek se určují automaticky.</p>
+<div class="grid">
+<div><label>Datum zásahu</label><input id="serviceDate" type="date" onchange="calculate()"></div>
+<div><label>Čas zásahu</label><input id="serviceTime" type="time" onchange="calculate()"></div>
+</div>
+<div id="autoSurcharges" style="margin-top:9px"></div>
+</div>
+
+<div class="card">
+<h2>5. Příplatky / služby</h2>
+<div id="extras"></div>
+</div>
+
+<div class="card">
+<button class="primary" onclick="calculate()">🔄 Přepočítat cenu</button>
+<p class="note" style="margin-bottom:0">Cena odtahu = počet km × cena za 1 km.</p>
 </div>
 </section>
 
 <section id="settings" class="hidden">
 <div class="card">
 <h2>Geoapify API</h2>
-<p class="note">API klíč se ukládá pouze do tohoto zařízení v localStorage. Není vložený přímo do veřejného GitHub souboru. Pro veřejné použití doporučuji v Geoapify nastavit povolený HTTP referrer pro tvoji GitHub Pages adresu.</p>
+<p class="note">API klíč se ukládá pouze do tohoto zařízení v localStorage. Pro veřejné použití nastav v Geoapify povolený HTTP referrer pro GitHub Pages.</p>
 <label>Geoapify API klíč</label>
 <input id="geoKey" type="password" placeholder="Vlož svůj Geoapify API key">
-<button class="primary" style="margin-top:10px" onclick="saveGeoKey()">Uložit API klíč</button>
+<button class="primary" style="margin-top:8px" onclick="saveGeoKey()">Uložit API klíč</button>
 <p id="keyStatus" class="note"></p>
 </div>
 
 <div class="card">
-<h2>Ceník – ceny lze kdykoliv změnit</h2>
+<h2>Ceník</h2>
 <div id="priceTables"></div>
 <button class="primary" onclick="saveSettings()">Uložit ceník</button>
-<button class="secondary" style="margin-top:8px;width:100%" onclick="resetSettings()">Obnovit výchozí ceny</button>
+<button class="secondary" style="margin-top:7px;width:100%" onclick="resetSettings()">Obnovit výchozí ceny</button>
 </div>
 </section>
 </main>
@@ -238,7 +185,7 @@ button.secondary{padding:10px 12px;border-radius:9px;font-size:14px;min-height:4
 <script>
 const defaultData={
 categories:[
-{id:"a",name:"Odtah do 2,2 t",km:0,extras:{manip:450,recovery:550,waiting:250}},
+{id:"a",name:"Odtah do 2,2 t",km:21,extras:{manip:450,recovery:550,waiting:250}},
 {id:"b",name:"Odtah 2,2–3,5 t",km:0,extras:{manip:450,recovery:550,waiting:250}},
 {id:"c",name:"Odtah 2,2–3,5 t – nadrozměrná vozidla",km:0,extras:{manip:900,recovery:900,waiting:300}},
 {id:"d",name:"Odtah nad 3,5–6,5 t",km:0,extras:{manip:1700,recovery:2000,waiting:500}}
@@ -263,13 +210,12 @@ function renderExtras(){
  const c=current(),g=data.general;
  const list=[["manip","Naložení / složení vozidla",c.extras.manip],["recovery","Vyproštění vozidla",c.extras.recovery],["waiting","Čekací doba – 30 min",c.extras.waiting],["difficult","Příplatek za ztíženou manipulaci",g.difficult]];
  document.getElementById("extras").innerHTML=list.map(x=>`<div class="check"><input id="x_${x[0]}" type="checkbox" onchange="calculate()"><label for="x_${x[0]}">${x[1]} <span style="color:#687386">(${money(x[2])})</span></label></div>`).join("")+
- `<div class="grid" style="margin-top:12px">
+ `<div class="grid" style="margin-top:9px">
  <div><label>Druhé vozidlo – km</label><input id="secondKm" type="number" min="0" value="0" oninput="calculate()"></div>
  <div><label>Přeprava osob – km</label><input id="personsKm" type="number" min="0" value="0" oninput="calculate()"></div>
  <div><label>Uskladnění do 3,5 t – dny</label><input id="storageU" type="number" min="0" value="0" oninput="calculate()"></div>
  <div><label>Uskladnění nad 3,5 t – dny</label><input id="storageO" type="number" min="0" value="0" oninput="calculate()"></div></div>`;
 }
-
 const CZ_HOLIDAYS_FIXED={"01-01":"Nový rok / Den obnovy samostatného českého státu","05-01":"Svátek práce","05-08":"Den vítězství","07-05":"Den slovanských věrozvěstů Cyrila a Metoděje","07-06":"Den upálení mistra Jana Husa","09-28":"Den české státnosti","10-28":"Den vzniku samostatného československého státu","11-17":"Den boje za svobodu a demokracii","12-24":"Štědrý den","12-25":"1. svátek vánoční","12-26":"2. svátek vánoční"};
 function easterSunday(year){
  const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;
@@ -298,9 +244,9 @@ function initServiceDateTime(){
 function renderAutoSurcharges(d){
  const weekend=d.getDay()===0||d.getDay()===6,minutes=d.getHours()*60+d.getMinutes(),night=minutes>=1260||minutes<360,holidayName=getCzechHolidayName(d),holiday=!!holidayName,g=data.general;
  const parts=[];
- parts.push(`<div class="check"><input type="checkbox" ${weekend?"checked":""} disabled><label>${weekend?"🟢":"⚪"} Víkendový příplatek ${weekend?"<span style='color:#687386'>(+"+money(g.weekend)+")</span>":"– neaktivní"}</label></div>`);
- parts.push(`<div class="check"><input type="checkbox" ${night?"checked":""} disabled><label>${night?"🟢":"⚪"} Noční příplatek 21:00–06:00 ${night?"<span style='color:#687386'>(+"+money(g.night)+")</span>":"– neaktivní"}</label></div>`);
- parts.push(`<div class="check"><input type="checkbox" ${holiday?"checked":""} disabled><label>${holiday?"🟢":"⚪"} Sváteční příplatek ${holiday?"– "+holidayName+" <span style='color:#687386'>(+"+money(g.holiday)+")</span>":"– neaktivní"}</label></div>`);
+ parts.push(`<div class="check"><input type="checkbox" ${weekend?"checked":""} disabled><label>${weekend?"🟢":"⚪"} Víkend ${weekend?"<span style='color:#687386'>(+"+money(g.weekend)+")</span>":"– neaktivní"}</label></div>`);
+ parts.push(`<div class="check"><input type="checkbox" ${night?"checked":""} disabled><label>${night?"🟢":"⚪"} Noc 21:00–06:00 ${night?"<span style='color:#687386'>(+"+money(g.night)+")</span>":"– neaktivní"}</label></div>`);
+ parts.push(`<div class="check"><input type="checkbox" ${holiday?"checked":""} disabled><label>${holiday?"🟢":"⚪"} Svátek ${holiday?"– "+holidayName+" <span style='color:#687386'>(+"+money(g.holiday)+")</span>":"– neaktivní"}</label></div>`);
  document.getElementById("autoSurcharges").innerHTML=parts.join("");
  return{weekend,night,holiday};
 }
@@ -349,7 +295,7 @@ function saveSettings(){
 function resetSettings(){if(confirm("Obnovit výchozí ceny?")){data=structuredClone(defaultData);localStorage.setItem("odtahCenik2026",JSON.stringify(data));populate()}}
 function showTab(t){calc.classList.toggle("hidden",t!=="calc");settings.classList.toggle("hidden",t!=="settings");tabCalc.classList.toggle("active",t==="calc");tabSettings.classList.toggle("active",t==="settings");if(t==="settings")renderSettings();updateKeyStatus()}
 
-/* ---------------- Geoapify map ---------------- */
+/* Geoapify map */
 let map,fromMarker,toMarker,routeLayer,fromPlace=null,toPlace=null,autocompleteTimers={};
 function getGeoKey(){return localStorage.getItem("geoapifyApiKey")||""}
 function saveGeoKey(){const key=document.getElementById("geoKey").value.trim();if(!key){alert("Vlož API klíč.");return}localStorage.setItem("geoapifyApiKey",key);updateKeyStatus();alert("Geoapify API klíč byl uložen do tohoto zařízení.");initMap()}
@@ -361,10 +307,7 @@ function initMap(){
  const tileUrl=key?`https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}.png?apiKey=${encodeURIComponent(key)}`:"https://tile.openstreetmap.org/{z}/{x}/{y}.png";
  L.tileLayer(tileUrl,{maxZoom:20,attribution:key?'Powered by <a href="https://www.geoapify.com/" target="_blank">Geoapify</a> | © OpenStreetMap contributors':'© OpenStreetMap contributors'}).addTo(map);
 }
-function debounceAutocomplete(which){
- clearTimeout(autocompleteTimers[which]);
- autocompleteTimers[which]=setTimeout(()=>loadSuggestions(which),350);
-}
+function debounceAutocomplete(which){clearTimeout(autocompleteTimers[which]);autocompleteTimers[which]=setTimeout(()=>loadSuggestions(which),350)}
 async function loadSuggestions(which){
  const key=getGeoKey(),input=document.getElementById(which+"Address"),box=document.getElementById(which+"Suggestions"),text=input.value.trim();
  if(!key||text.length<3){box.classList.add("hidden");return}
@@ -394,12 +337,7 @@ function showPlace(which,p){
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function setRouteStatus(text,cls=""){routeStatus.textContent=text;routeStatus.className="mapStatus "+cls}
-function getRouteMode(){
- const id=current().id;
- if(id==="d")return"medium_truck";
- return"light_truck";
-}
-
+function getRouteMode(){return current().id==="d"?"medium_truck":"light_truck"}
 function useMyLocation(){
  const key=getGeoKey(),status=document.getElementById("locationStatus");
  if(!navigator.geolocation){status.textContent="Tento iPhone nepodporuje zjištění polohy.";status.className="note error";return}
@@ -428,7 +366,6 @@ function useMyLocation(){
   status.textContent="📍 "+msg;status.className="note error";
  },{enableHighAccuracy:true,timeout:15000,maximumAge:30000});
 }
-
 async function calculateRoute(){
  const key=getGeoKey();
  if(!key){setRouteStatus("Nejdřív vlož Geoapify API klíč v záložce „Ceník / mapa“.","warn");showTab("settings");return}
@@ -452,18 +389,24 @@ function clearRoute(){
  fromPlace=null;toPlace=null;fromAddress.value="";toAddress.value="";fromSuggestions.classList.add("hidden");toSuggestions.classList.add("hidden");
  if(routeLayer){map.removeLayer(routeLayer);routeLayer=null}
  if(fromMarker){map.removeLayer(fromMarker);fromMarker=null}if(toMarker){map.removeLayer(toMarker);toMarker=null}
- document.getElementById("km").value=0;calculate();setRouteStatus("Mapa čeká na zadání obou adres.");
- map.setView([49.8175,15.473],7);
+ document.getElementById("km").value=0;calculate();setRouteStatus("Mapa čeká na zadání obou adres.");map.setView([49.8175,15.473],7);
 }
 function routeIfReady(){if(fromPlace&&toPlace)calculateRoute()}
-
 fromAddress.addEventListener("input",()=>debounceAutocomplete("from"));
 toAddress.addEventListener("input",()=>debounceAutocomplete("to"));
 document.addEventListener("click",e=>{if(!e.target.closest(".autocomplete")){fromSuggestions.classList.add("hidden");toSuggestions.classList.add("hidden")}});
 
+/* Řidičský pracovní tok */
+document.getElementById("driverQuick").addEventListener("click",function(e){
+ const b=e.target.closest("button");if(!b)return;
+ const target=b.dataset.go;
+ let el=target==="location"?document.getElementById("fromAddress"):target==="target"?document.getElementById("toAddress"):document.getElementById("resultOut");
+ if(target==="location"){const btn=document.querySelector('button[onclick="useMyLocation()"]');if(btn)btn.click();return}
+ if(el)el.scrollIntoView({behavior:"smooth",block:"center"});
+});
 populate();initServiceDateTime();calculate();
 window.addEventListener("load",()=>setTimeout(initMap,100));
-if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=20260812-map"));
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=20260813-driver"));
 </script>
 </body>
 </html>
