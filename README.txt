@@ -1,23 +1,20 @@
-ODTAH DOPLATEK – PWA PRO IPHONE
-================================
+TowBrüx Dispatch
+=================
 
-Tato verze je připravená jako instalovatelná webová aplikace (PWA).
+Based on the current Odtah Doplatek / Dispatch index.
 
-Soubory:
+Changes:
+- renamed visible branding to TowBrüx Dispatch
+- dark TowBrüx Driver visual language: black panels, yellow accent, rounded cards
+- bottom navigation matching Driver style
+- Dispatch app icon assets
+- manifest updated for TowBrüx Dispatch
+- existing calculator, OCR, routing, map, price-list and WhatsApp logic preserved
+- existing localStorage key odtahCenik2026 preserved so saved prices are not discarded
+
+Files:
 - index.html
 - manifest.webmanifest
-- sw.js
-- ikony pro iPhone/PWA
-
-DŮLEŽITÉ:
-Aby šla aplikace na iPhonu nainstalovat přes Safari pomocí „Přidat na plochu“
-a aby fungovala jako PWA/offline aplikace, musí být tyto soubory nahrané na
-web s HTTPS. Samotné otevření souboru z aplikace Soubory nestačí pro instalaci PWA.
-
-Po nahrání:
-1. Otevři adresu aplikace v Safari.
-2. Klepni na Sdílet.
-3. Zvol „Přidat na plochu“.
-4. Aplikace se objeví jako „Odtah Doplatek“.
-
-Ceník zůstává uložený lokálně v zařízení stejně jako v první verzi.
+- icon-180.png
+- icon-512.png
+- towbrux-logo-512.png

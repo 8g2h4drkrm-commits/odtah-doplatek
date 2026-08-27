@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1764ff">
+<meta name="theme-color" content="#080b10">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Odtah Doplatek">
+<meta name="apple-mobile-web-app-title" content="TowBrüx Dispatch">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<title>Odtah – doplatek klienta</title>
+<title>TowBrüx Dispatch</title>
 <style>
 :root{--blue:#1764ff;--blue2:#0b4fd9;--bg:#f3f6fb;--card:#fff;--text:#18243a;--muted:#6d7a90;--line:#dce4ef;--soft:#f5f8fc;--ok:#138a52;--warn:#b36b00;--red:#c62828}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:15px}
@@ -72,18 +72,434 @@ button.secondary{border:0;background:#eef2f8;color:#344055;padding:10px 12px;bor
 
 .addressBox + .addressBox{margin-top:9px}
 .addressBox label{font-weight:800}
+
+/* =========================================================
+   TowBrüx Dispatch UI
+   Visual language shared with TowBrüx Driver.
+   Functional logic below is intentionally preserved.
+   ========================================================= */
+:root{
+  --blue:#2f6df6;
+  --blue2:#1f56c7;
+  --bg:#020408;
+  --card:#111720;
+  --text:#f5f7fa;
+  --muted:#9ba7b6;
+  --line:#29333f;
+  --soft:#18212c;
+  --ok:#20b26b;
+  --warn:#f5b900;
+  --red:#e5484d;
+  --gold:#f5b900;
+  --goldText:#111;
+}
+*{box-sizing:border-box}
+html{background:#020408}
+body{
+  margin:0;
+  background:#020408;
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  font-size:15px;
+  -webkit-tap-highlight-color:transparent;
+}
+header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:#080b10ee;
+  border-bottom:1px solid var(--line);
+  padding:11px 15px 10px;
+  box-shadow:none;
+  backdrop-filter:blur(12px);
+}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{
+  width:46px;height:46px;object-fit:cover;
+  border-radius:13px;flex:0 0 46px;
+}
+header h1{
+  font-size:20px;
+  line-height:1.05;
+  margin:0 0 3px;
+  color:#f5f7fa;
+  font-weight:900;
+}
+header h1 span{color:var(--gold)}
+header p{margin:0;color:var(--muted);opacity:1;font-size:12px}
+
+nav{
+  position:fixed;
+  left:50%;
+  bottom:0;
+  top:auto;
+  transform:translateX(-50%);
+  width:min(900px,100%);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px;
+  padding:7px 10px calc(7px + env(safe-area-inset-bottom));
+  background:#080b10f5;
+  border-top:1px solid var(--line);
+  z-index:1100;
+  box-shadow:none;
+  backdrop-filter:blur(14px);
+}
+nav button{
+  min-height:50px;
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  padding:6px 8px;
+  border-radius:13px;
+  font-weight:900;
+  font-size:12px;
+}
+nav button.active{
+  background:#202a36;
+  color:var(--gold);
+}
+.navIco{display:block;font-size:20px;line-height:20px;margin-bottom:2px}
+
+main{
+  max-width:900px;
+  margin:auto;
+  padding:12px 10px 96px;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:15px;
+  margin-bottom:12px;
+  box-shadow:none;
+}
+h2{
+  font-size:16px;
+  margin:0 0 9px;
+  color:#f5f7fa;
+  font-weight:900;
+}
+.sectionTitle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.sectionTitle:before{
+  content:"";
+  width:5px;
+  height:19px;
+  border-radius:4px;
+  background:var(--gold);
+  display:inline-block;
+}
+label{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:800;
+  margin-bottom:5px;
+}
+input,select,textarea{
+  width:100%;
+  min-height:48px;
+  padding:11px 12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--soft);
+  color:var(--text);
+  font-size:16px;
+  outline:none;
+}
+textarea{min-height:145px;resize:vertical}
+input:focus,select:focus,textarea:focus{
+  outline:3px solid rgba(245,185,0,.13);
+  border-color:#66707c;
+}
+button{touch-action:manipulation}
+button.primary{
+  width:100%;
+  border:0;
+  background:var(--gold);
+  color:var(--goldText);
+  padding:13px 12px;
+  border-radius:14px;
+  font-size:15px;
+  font-weight:900;
+  min-height:48px;
+  box-shadow:none;
+}
+button.secondary{
+  border:1px solid #34404d;
+  background:#202a36;
+  color:#fff;
+  padding:12px;
+  border-radius:14px;
+  font-weight:900;
+  font-size:14px;
+  min-height:48px;
+}
+button.primary:hover{filter:brightness(1.03)}
+button.secondary:hover{background:#263342}
+
+.note{
+  font-size:11.5px;
+  line-height:1.4;
+  color:var(--muted);
+  margin:6px 0;
+}
+.hidden{display:none}
+.pill{
+  display:inline-block;
+  background:#302608;
+  color:#ffd84d;
+  padding:5px 8px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:900;
+}
+
+.addressRow{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 44px 44px 44px;
+  gap:6px;
+  align-items:end;
+  margin-top:8px;
+}
+.iconBtn{
+  border:1px solid #34404d;
+  background:#202a36;
+  color:#fff;
+  border-radius:12px;
+  min-height:48px;
+  font-size:18px;
+  font-weight:900;
+}
+.iconBtn.home{color:var(--gold)}
+.addressBox{position:relative}
+.suggestions{
+  position:absolute;
+  left:0;right:0;top:100%;
+  z-index:3000;
+  background:#111720;
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:0 10px 28px #0008;
+  overflow:hidden;
+}
+.suggestion{
+  padding:11px;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+  color:#f5f7fa;
+  cursor:pointer;
+}
+.suggestion:last-child{border-bottom:0}
+.suggestion:hover{background:#18212c}
+
+.routeStatus{
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px;
+  margin-top:8px;
+  font-size:12px;
+  font-weight:800;
+}
+.ok{color:#4bd88d}.warn{color:#ffd84d}.error{color:#ff7777}
+
+#map{
+  height:260px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  margin-top:9px;
+  overflow:hidden;
+}
+.leaflet-control-zoom a{
+  background:#111720!important;
+  color:#fff!important;
+  border-color:var(--line)!important;
+}
+.leaflet-control-attribution{
+  background:#080b10cc!important;
+  color:#9ba7b6!important;
+}
+.leaflet-control-attribution a{color:#c7d0da!important}
+
+#importCard{
+  background:#111720;
+  border:1px solid #3b4653;
+}
+.importCard{
+  border:1px solid #3b4653;
+  background:#111720;
+}
+.importCard h2,.importTitle{color:#f5f7fa}
+.importTitle{font-weight:900;font-size:15px;margin-bottom:4px}
+.importBtns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+
+#autoSurcharges{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+}
+.check{
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:9px 10px;
+  min-height:48px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.check input{
+  width:18px;height:18px;min-height:18px;
+  accent-color:var(--gold);
+  margin:0;
+}
+.check label{margin:0;color:var(--text);font-size:12px}
+
+#extras{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+#extras .check{min-height:50px}
+
+.result{
+  background:var(--card);
+  color:var(--text);
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:8px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+.result .row{
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:3px;
+  font-size:12px;
+  color:var(--muted);
+  min-height:58px;
+}
+.result .row b{
+  font-size:17px;
+  color:#f5f7fa;
+}
+.result .highlight{
+  grid-column:1/-1;
+  background:#302608;
+  border:1px solid #6a5512;
+  border-radius:14px;
+  padding:13px 10px;
+  text-align:center;
+}
+.result .big{
+  font-size:35px;
+  color:var(--gold);
+  line-height:1.05;
+  margin:4px 0;
+  font-weight:900;
+}
+.result .vatAmount{font-size:25px;color:#ffd84d}
+.result .highlight small{display:block;margin-top:3px;color:#d5c477}
+
+.tripLegs{
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:10px;
+}
+.tripTotal{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  font-size:13px;
+  padding-bottom:7px;
+  border-bottom:1px solid var(--line);
+}
+.tripTotal span{font-weight:900;color:var(--gold)}
+.tripLeg{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  padding:7px 0;
+  font-size:12px;
+  border-bottom:1px solid var(--line);
+  color:#dce2e9;
+}
+.tripLeg:last-child{border-bottom:0}
+.tripLeg span:last-child{font-weight:900;white-space:nowrap;color:#fff}
+
+#settings .card{box-shadow:none}
+.priceCard{border-style:dashed}
+#settings .priceCard h2{color:#fff}
+
+.mapPickerPanel{
+  background:var(--soft)!important;
+  color:var(--text)!important;
+  border:1px solid var(--line)!important;
+  border-radius:13px!important;
+  padding:10px!important;
+}
+.mapPickerTitle{font-weight:900;color:#fff}
+.mapPickerHelp{color:var(--muted)}
+
+.statusline,.mapStatus{
+  color:var(--muted);
+}
+.statusline.ok,.mapStatus.ok{color:#4bd88d}
+.statusline.bad,.mapStatus.error{color:#ff7777}
+
+@media(max-width:600px){
+  main{padding:9px 8px 94px}
+  #autoSurcharges{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  .card{padding:13px}
+  .addressRow{grid-template-columns:minmax(0,1fr) 42px 42px 42px}
+  #extras{grid-template-columns:1fr}
+  #extras>.grid{grid-template-columns:1fr 1fr}
+  #map{height:220px}
+  .result{grid-template-columns:1fr 1fr}
+}
+@media(max-width:380px){
+  .result{grid-template-columns:1fr}
+  .result .highlight{grid-column:1}
+  .addressRow{grid-template-columns:minmax(0,1fr) 40px 40px 40px}
+}
+
 </style>
 </head>
 <body>
-<header><h1>🚚 Odtah – doplatek klienta</h1><p>Výpočet ceny odtahu • ceny bez DPH</p></header>
-<nav><button id="tabCalc" class="active" onclick="showTab('calc')">Výpočet</button><button id="tabSettings" onclick="showTab('settings')">Ceník / mapa</button></nav>
+<header>
+  <div class="brand">
+    <img src="icon-180.png" class="logo" alt="TowBrüx Dispatch">
+    <div>
+      <h1>Tow<span>Brüx</span> Dispatch</h1>
+      <p>Dispečerská aplikace • doplatek klienta</p>
+    </div>
+  </div>
+</header>
+<nav>
+  <button id="tabCalc" class="active" onclick="showTab('calc')"><span class="navIco">📋</span>Dispatch</button>
+  <button id="tabSettings" onclick="showTab('settings')"><span class="navIco">⚙️</span>Nastavení</button>
+</nav>
 <main>
 <section id="calc">
 <section class="card importCard">
 <h2>📷 Načíst zakázku ze screenshotu</h2>
 <p class="note">Vyber screenshot detailu zakázky z Fotek. Aplikace se pokusí načíst lokaci klienta, cílové místo a finanční limit.</p>
 <input id="jobImage" type="file" accept="image/*" style="display:none">
-<button class="primary" type="button" onclick="document.getElementById('jobImage').click()">📷 VYBRAT SCREENSHOT ZAKÁZKY</button>
+<button class="primary" type="button" onclick="document.getElementById('jobImage').click()">📷 NAČÍST ZAKÁZKU</button>
 <div id="ocrStatus" class="mapStatus" style="margin-top:8px">Čeká na screenshot zakázky.</div>
 <div id="ocrPreview" class="hidden" style="margin-top:8px"></div>
 </section>
@@ -92,12 +508,12 @@ button.secondary{border:0;background:#eef2f8;color:#344055;padding:10px 12px;bor
   <div class="importTitle">📋 Rychlé načtení zakázky</div>
   <p class="note">V Europe Assistance otevři detail zakázky, zkopíruj jeho text a tady klepni na <b>Vložit zakázku</b>. Aplikace se pokusí najít zásah, cíl a finanční limit.</p>
   <div class="importBtns">
-    <button class="primary" onclick="pasteOrder()">📋 Vložit zakázku</button>
-    <button class="secondary" onclick="toggleImportText()">✍️ Vložit ručně</button>
+    <button class="primary" onclick="pasteOrder()">📋 VLOŽIT ZAKÁZKU</button>
+    <button class="secondary" onclick="toggleImportText()">✍️ VLOŽIT RUČNĚ</button>
   </div>
   <div id="importArea" class="hidden" style="margin-top:8px">
     <textarea id="orderText" placeholder="Vlož sem celý text detailu zakázky z Europe Assistance…"></textarea>
-    <button class="primary" style="margin-top:7px" onclick="parseOrderText()">Načíst údaje ze zakázky</button>
+    <button class="primary" style="margin-top:7px" onclick="parseOrderText()">Načíst zakázku</button>
   </div>
   <div id="importStatus" class="note"></div>
 </div>
@@ -200,7 +616,7 @@ button.secondary{border:0;background:#eef2f8;color:#344055;padding:10px 12px;bor
 </div>
 </div>
 <div class="card">
-<button class="primary" onclick="calculate()">Přepočítat</button>
+<button class="primary" onclick="calculate()">PŘEPOČÍTAT</button>
 <button class="primary" style="margin-top:7px;background:#25D366" onclick="sendWhatsApp()">📲 Odeslat na WhatsApp</button>
 <p class="note" style="margin-bottom:0">Ceny a limit jsou vedené bez DPH. Výsledná cena se zobrazuje také s DPH 21 %.</p>
 </div>
@@ -210,9 +626,9 @@ button.secondary{border:0;background:#eef2f8;color:#344055;padding:10px 12px;bor
 <div class="card">
 <h2 class="sectionTitle">Geoapify API</h2><p class="note">Klíč se ukládá pouze do tohoto zařízení.</p>
 <label>Geoapify API klíč</label><input id="geoKey" type="password" placeholder="Vlož API klíč">
-<button class="primary" style="margin-top:8px" onclick="saveGeoKey()">Uložit API klíč</button><p id="keyStatus" class="note"></p>
+<button class="primary" style="margin-top:8px" onclick="saveGeoKey()">ULOŽIT API KLÍČ</button><p id="keyStatus" class="note"></p>
 </div>
-<div class="card"><h2 class="sectionTitle">Ceník</h2><div id="priceTables"></div><button class="primary" onclick="saveSettings()">Uložit ceník</button><button class="secondary" style="margin-top:7px;width:100%" onclick="resetSettings()">Obnovit výchozí ceny</button></div>
+<div class="card"><h2 class="sectionTitle">Ceník</h2><div id="priceTables"></div><button class="primary" onclick="saveSettings()">ULOŽIT CENÍK</button><button class="secondary" style="margin-top:7px;width:100%" onclick="resetSettings()">OBNOVIT VÝCHOZÍ CENY</button></div>
 </section>
 </main>
 
@@ -278,7 +694,7 @@ function renderSettings(){let h="";data.categories.forEach((c,i)=>h+=`<div class
 function setting(l,p,v){return`<div><label>${l}</label><input data-path="${p}" value="${v}" type="number" step=".01"></div>`}
 function setPath(p,v){const a=p.split(".");if(a[0]==="c"){const c=data.categories[+a[1]];a[2]==="km"?c.km=v:c.extras[a[3]]=v}else data.general[a[1]]=v}
 function saveSettings(){document.querySelectorAll("#settings input[data-path]").forEach(e=>setPath(e.dataset.path,+e.value||0));localStorage.setItem("odtahCenik2026",JSON.stringify(data));populate();showTab("calc");alert("Ceník uložen.")}
-function resetSettings(){if(confirm("Obnovit výchozí ceny?")){data=structuredClone(defaultData);localStorage.setItem("odtahCenik2026",JSON.stringify(data));populate()}}
+function resetSettings(){if(confirm("OBNOVIT VÝCHOZÍ CENY?")){data=structuredClone(defaultData);localStorage.setItem("odtahCenik2026",JSON.stringify(data));populate()}}
 function showTab(t){calc.classList.toggle("hidden",t!=="calc");settings.classList.toggle("hidden",t!=="settings");tabCalc.classList.toggle("active",t==="calc");tabSettings.classList.toggle("active",t==="settings");if(t==="settings")renderSettings();updateKeyStatus()}
 function getGeoKey(){return localStorage.getItem("geoapifyApiKey")||""}
 function saveGeoKey(){const k=geoKey.value.trim();if(!k)return alert("Vlož API klíč.");localStorage.setItem("geoapifyApiKey",k);updateKeyStatus();initMap();alert("API klíč uložen.")}
@@ -371,7 +787,7 @@ function useMyLocation(which){
 }
 async function calculateFullTrip(){
  const key=getGeoKey();
- if(!key){setRouteStatus("Nejdřív vlož Geoapify API klíč v záložce „Ceník / mapa“.","warn");showTab("settings");return}
+ if(!key){setRouteStatus("Nejdřív vlož Geoapify API klíč v záložce „Nastavení“.","warn");showTab("settings");return}
  if(!fromPlace||!toPlace){
    setRouteStatus("Nejdřív nastav výchozí bod a cíl.","warn");return
  }
@@ -512,7 +928,7 @@ function mapPointClickHandler(e){
 async function calculateRoute(){
  const k=getGeoKey();
  if(!k){
-   setStatus("Nejdřív vlož Geoapify API klíč v Ceník / mapa.","warn");
+   setStatus("Nejdřív vlož Geoapify API klíč v Nastavení.","warn");
    showTab("settings");
    return;
  }
@@ -694,7 +1110,7 @@ async function pasteOrder(){
     orderText.value=text;
     parseOrderText();
   }catch(e){
-    importStatus.textContent="Schránku Safari nemusí povolit automaticky. Klepni do pole níže a zvol „Vložit“, potom „Načíst údaje ze zakázky“.";
+    importStatus.textContent="Schránku Safari nemusí povolit automaticky. Klepni do pole níže a zvol „Vložit“, potom „Načíst zakázku“.";
     orderText.focus();
   }
 }
@@ -744,7 +1160,7 @@ document.addEventListener("click",e=>{if(!e.target.closest(".addressBox"))docume
 const serviceDateEl=document.getElementById("serviceDate");
 populate();initDate();calculate();initMap();
 window.addEventListener("load",()=>setTimeout(initMap,100));
-if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=20260814-import"));
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=20260827-dispatch"));
 </script>
 
 
@@ -753,7 +1169,7 @@ function sendWhatsApp(){
   const val = id => document.getElementById(id)?.value?.trim() || "";
   const txt = id => document.getElementById(id)?.textContent?.trim() || "";
   const msg = [
-    "🚚 Odtah – doplatek klienta",
+    "🚚 TowBrüx Dispatch",
     "",
     "Trasa:",
     "🚚 Výjezd: " + val("fromAddress"),
