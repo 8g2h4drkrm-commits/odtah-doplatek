@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080b10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TowBrüx Dispatch">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<title>TowBrüx Dispatch</title>
+<style>
+:root{--bg:#05080c;--card:#111720;--card2:#19232e;--line:#2c3947;--text:#f5f7fa;--muted:#9ba7b6;--gold:#f5b900;--green:#39d98a;--red:#ef6262}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+body{min-height:100vh}.app{max-width:600px;margin:auto;min-height:100vh;background:linear-gradient(#080b10,#0b1017)}
+header{position:sticky;top:0;z-index:1000;background:#080b10f2;border-bottom:1px solid var(--line);padding:14px 15px}
+.brand{display:flex;align-items:center;gap:10px}.brand img{width:45px;height:45px;object-fit:contain}.brand b{font-size:21px}.brand b span{color:var(--gold)}.sub,.note,.small{font-size:12px;line-height:1.45;color:var(--muted)}
+nav{position:sticky;top:75px;z-index:999;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 10px;background:#080b10f5;border-bottom:1px solid var(--line)}
+nav button,.secondary{min-height:46px;border:1px solid var(--line);border-radius:14px;background:#202a36;color:#fff;font-weight:900;font-size:14px}
+nav button{color:var(--muted)}nav button.active{background:var(--gold);border-color:var(--gold);color:#111}
+main{padding:14px 14px 40px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:12px}
+h2{font-size:17px;margin:0 0 10px}.sectionTitle{display:flex;align-items:center;gap:8px}.sectionTitle:before{content:"";width:5px;height:18px;border-radius:4px;background:var(--gold)}
+label{display:block;margin:7px 0 5px;color:var(--muted);font-size:12px;font-weight:800}
+input,select,textarea{width:100%;min-height:44px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card2);color:var(--text);font-size:15px;outline:none}
+textarea{min-height:130px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.primary{width:100%;min-height:46px;padding:13px;border:0;border-radius:14px;background:var(--gold);color:#111;font-weight:900;font-size:15px}.danger{width:100%;min-height:46px;padding:13px;border:1px solid #7d2e34;border-radius:14px;background:#3d1519;color:#ff9292;font-weight:900}
+button:disabled{opacity:.5}.hidden{display:none!important}.ok{color:var(--green)!important}.warn{color:#ffd04a!important}.error{color:#ff7773!important}
+.status{margin-top:8px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--card2);font-size:12px;font-weight:800}
+.addressBox{position:relative}.addressRow{display:grid;grid-template-columns:minmax(0,1fr) 44px 44px;gap:7px}.iconBtn{min-height:44px;border:1px solid var(--line);border-radius:12px;background:#202a36;color:#69a1ff;font-size:18px}.home{color:#ffd04a}
+.suggestions{position:absolute;left:0;right:0;top:100%;z-index:4000;background:#18212c;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 10px 30px #000b}.suggestion{padding:11px;border-bottom:1px solid var(--line);font-size:13px}.suggestion:last-child{border:0}
+#map{height:260px;margin-top:9px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.check{display:flex;align-items:center;gap:8px;padding:9px;background:var(--card2);border:1px solid var(--line);border-radius:12px;margin-bottom:7px}.check input{width:18px;min-height:18px}.check label{margin:0;color:var(--text)}
+.result{display:grid;grid-template-columns:1fr 1fr;gap:7px}.result .row{padding:9px;border:1px solid var(--line);border-radius:11px;background:var(--card2);font-size:12px}.result .row b{display:block;margin-top:3px;font-size:16px}
+.highlight{grid-column:1/-1;padding:11px;border:1px solid #66500b;border-radius:12px;background:#302608;text-align:center}.big{font-size:29px;color:var(--gold);font-weight:900}.vat{font-size:22px}
+.docsToolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.docsGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.docItem{padding:8px;border:1px solid var(--line);border-radius:14px;background:var(--card2);overflow:hidden}.docItem img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px}.docTitle{margin-top:7px;font-size:13px;font-weight:900}.docMeta{margin-top:3px;font-size:11px;color:var(--muted)}.docButtons{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px}.docButtons button{min-height:38px;padding:7px 4px;font-size:11px}.missing{min-height:125px;display:flex;align-items:center;justify-content:center;text-align:center;background:#080b10;border-radius:10px;color:var(--muted);font-size:12px}
+.tripLegs{margin-top:9px;padding:10px;border:1px solid var(--line);border-radius:13px;background:var(--card2)}.tripTotal,.tripLeg{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12px}.tripTotal span{color:var(--gold);font-weight:900}.tripLeg:last-child{border:0}
+.confirmOverlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:18px;background:#000c}.confirmBox{width:100%;max-width:430px;padding:18px;border:1px solid #66500b;border-radius:20px;background:#111720}.confirmBox h3{margin:0 0 10px}.confirmActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.confirmActions button{min-height:48px;border-radius:14px;font-weight:900}.cancel{background:#202a36;color:#fff;border:1px solid var(--line)}.confirmDelete{background:#59191d;color:#fff;border:1px solid #8b3035}
+@media(max-width:520px){.grid{grid-template-columns:1fr}}@media(max-width:380px){.result,.docsGrid,.docsToolbar,.confirmActions{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="confirmOverlay" class="confirmOverlay hidden">
+  <div class="confirmBox">
+    <h3>🗑️ Potvrdit smazání</h3>
+    <div id="confirmText" class="note"></div>
+    <div class="confirmActions">
+      <button id="confirmCancel" class="cancel" type="button">ZRUŠIT</button>
+      <button id="confirmDelete" class="confirmDelete" type="button">🗑️ ANO, SMAZAT</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+<header><div class="brand"><img src="icon.svg" onerror="this.style.display='none'"><div><b>Tow<span>Brüx</span> Dispatch</b><div class="sub">Dispečink • správa a odesílání zakázek řidičům</div></div></div></header>
+<nav><button id="tabCalc" class="active" type="button">🧮 Výpočet</button><button id="tabSettings" type="button">⚙️ Ceník / mapa</button></nav>
+
+<main>
+<section id="calc">
+<div class="card">
+<h2>📷 Načíst zakázku ze screenshotu</h2>
+<p class="note">Můžeš načíst více screenshotů jedné zakázky. Další screenshot doplní chybějící údaje.</p>
+<input id="jobImage" type="file" accept="image/*" style="display:none">
+<button class="primary" id="pickScreenshot" type="button">📷 VYBRAT SCREENSHOT ZAKÁZKY</button>
+<div id="ocrStatus" class="status">Čeká na screenshot zakázky.</div>
+<div id="ocrDraft" class="hidden"></div>
+</div>
+
+<div class="card">
+<h2>📋 Rychlé načtení zakázky</h2>
+<p class="note">Vlož text detailu z Europe Assistance. Text může doplnit screenshoty.</p>
+<div class="grid"><button class="primary" id="pasteBtn" type="button">📋 Vložit zakázku</button><button class="secondary" id="manualBtn" type="button">✍️ Vložit ručně</button></div>
+<div id="importArea" class="hidden" style="margin-top:8px"><textarea id="orderText" placeholder="Vlož sem celý text detailu zakázky…"></textarea><button class="primary" id="parseBtn" type="button" style="margin-top:8px">Načíst údaje ze zakázky</button></div>
+<div id="importStatus" class="note"></div>
+</div>
+
+<div class="card">
+<h2 class="sectionTitle">1. Vozidlo a vzdálenost</h2>
+<label>Kategorie vozidla</label><select id="category"></select>
+<div class="grid"><div><label>Vzdálenost odtahu (km)</label><input id="km" type="number" min="0" step=".1" value="0"></div><div><label>Limit klienta (Kč bez DPH)</label><input id="limit" type="number" min="0" value="1652"></div></div>
+<div id="realCostsNote" class="note hidden">💰 Limit klienta: <b>REÁLNÉ NÁKLADY</b></div><div id="catNote" class="note"></div>
+</div>
+
+<div class="card">
+<h2 class="sectionTitle">2. Trasa a adresy</h2>
+<p class="note">Pořadí: <b>výjezd → zásah → servis → návrat</b>.</p>
+<div class="addressBox"><label>🚚 1. Výjezd</label><div class="addressRow"><div><input id="fromAddress" autocomplete="off" placeholder="Zadej adresu výjezdu"><div id="fromSuggestions" class="suggestions hidden"></div></div><button class="iconBtn" data-gps="from" type="button">📍</button><button class="iconBtn home" data-home="from" type="button">🏠</button></div><div id="fromStatus" class="note">Výjezd zatím není zadaný.</div></div>
+<div class="addressBox" style="margin-top:9px"><label>📍 2. Zásah klienta</label><div class="addressRow"><div><input id="impactAddress" autocomplete="off" placeholder="Načte se ze zakázky"><div id="impactSuggestions" class="suggestions hidden"></div></div><button class="iconBtn" data-gps="impact" type="button">📍</button><button class="iconBtn home" data-home="impact" type="button">🏠</button></div><div id="impactStatus" class="note">Po načtení zakázky se vyplní automaticky.</div></div>
+<div class="addressBox" style="margin-top:9px"><label>🔧 3. Servis klienta</label><div class="addressRow"><div><input id="toAddress" autocomplete="off" placeholder="Načte se ze zakázky"><div id="toSuggestions" class="suggestions hidden"></div></div><button class="iconBtn" data-gps="to" type="button">📍</button><button class="iconBtn home" data-home="to" type="button">🏠</button></div><div id="toStatus" class="note">Po načtení zakázky se vyplní automaticky.</div></div>
+<div class="addressBox" style="margin-top:9px"><label>🏁 4. Návrat / konec trasy</label><div class="addressRow"><div><input id="returnAddress" autocomplete="off" placeholder="Zadej adresu návratu"><div id="returnSuggestions" class="suggestions hidden"></div></div><button class="iconBtn" data-gps="return" type="button">📍</button><button class="iconBtn home" data-home="return" type="button">🏠</button></div><div id="returnStatus" class="note">Např. sídlo firmy nebo tvoje poloha.</div></div>
+<div class="grid" style="margin-top:9px"><button id="routeBtn" class="primary" type="button">🗺️ Spočítat celou trasu</button><button id="clearRouteBtn" class="secondary" type="button">Vymazat trasu</button></div>
+<div id="routeStatus" class="status">Zadej výjezd, zásah, servis a návrat.</div><div id="map"></div>
+</div>
+
+<div class="card"><h2 class="sectionTitle">3. Datum a čas zásahu</h2><div class="grid"><div><label>Datum zásahu</label><input id="serviceDate" type="date"></div><div><label>Čas zásahu</label><input id="serviceTime" type="time"></div></div><div id="autoSurcharges" style="margin-top:8px"></div></div>
+<div class="card"><h2 class="sectionTitle">4. Příplatky / služby</h2><div id="extras"></div></div>
+
+<div class="card">
+<h2 class="sectionTitle">5. Výsledek</h2>
+<div class="result">
+<div class="row">Odtah bez DPH<b id="baseOut">0 Kč</b></div><div class="row">Příplatky bez DPH<b id="extrasOut">0 Kč</b></div><div class="row">Celkem bez DPH<b id="totalOut">0 Kč</b></div><div class="row">Celkem s DPH<b id="totalVatOut">0 Kč</b></div><div class="row">Limit klienta bez DPH<b id="limitOut">0 Kč</b></div>
+<div class="highlight"><small id="resultLabel">DOPLATEK KLIENTA – BEZ DPH</small><div id="resultOut" class="big">0 Kč</div><small id="resultVatLabel">DOPLATEK KLIENTA – S DPH</small><div id="resultVatOut" class="big vat">0 Kč</div></div>
+</div>
+</div>
+
+<div class="card"><button class="primary" id="recalcBtn" type="button">Přepočítat</button><p class="note">Ceny a limit jsou vedené bez DPH. DPH je 21 %.</p></div>
+
+<div class="card" style="border-color:#66500b">
+<h2 class="sectionTitle">6. Odeslat zakázku řidiči</h2>
+<div class="grid"><div><label>ID řidiče</label><input id="dispatchDriver" value="driver1"></div><div><label>Číslo zakázky</label><input id="dispatchJobNo" placeholder="automaticky"></div></div>
+<button class="primary" id="sendBtn" type="button" style="margin-top:8px">📨 ODESLAT DO DRIVERU</button><div id="dispatchStatus" class="status">Připraveno k odeslání.</div>
+</div>
+
+<div class="card" style="border-color:#3b4b61">
+<h2 class="sectionTitle">📂 Dokumentace zásahu</h2>
+<p class="note">Fotografie a zakázkový list uložené řidičem u konkrétní zakázky.</p>
+<div class="grid"><div><label>Řidič</label><input id="docsDriver" value="driver1"></div><div><label>Zakázka</label><select id="docsJobSelect"><option value="">Nejdřív načti zakázky</option></select></div></div>
+<div class="docsToolbar"><button class="primary" id="loadJobsBtn" type="button">🔄 NAČÍST ZAKÁZKY</button><button class="secondary" id="showDocsBtn" type="button">📂 ZOBRAZIT DOKUMENTACI</button></div>
+<button id="deleteJobButton" class="danger" type="button" disabled style="margin-top:8px">🗑️ SMAZAT ZAKÁZKU + DOKUMENTACI</button>
+<div id="docsJobInfo" class="status hidden"></div><div id="docsStatus" class="status">Vyber zakázku a zobraz dokumentaci.</div><div id="docsGrid" class="docsGrid"></div>
+</div>
+</section>
+
+<section id="settings" class="hidden">
+<div class="card"><h2 class="sectionTitle">Geoapify API</h2><p class="note">Klíč se ukládá pouze do tohoto zařízení.</p><label>Geoapify API klíč</label><input id="geoKey" type="password" placeholder="Vlož Geoapify API key"><button class="primary" id="saveGeoBtn" type="button" style="margin-top:8px">Uložit API klíč</button><div id="keyStatus" class="note"></div></div>
+<div class="card"><h2 class="sectionTitle">TowBrüx Dispatch / Supabase</h2><p class="note">Použij stejný Supabase Publishable key jako v Driveru.</p><label>Supabase Publishable key</label><input id="supabaseKey" type="password" placeholder="Vlož Publishable key"><label>ID výchozího řidiče</label><input id="defaultDriver" value="driver1"><button class="primary" id="saveSupabaseBtn" type="button" style="margin-top:8px">Uložit a ověřit připojení</button><button class="secondary" id="testSupabaseBtn" type="button" style="width:100%;margin-top:7px">🔎 OTESTOVAT SUPABASE</button><div id="dispatchConnectionStatus" class="note"></div></div>
+<div class="card"><h2 class="sectionTitle">Ceník</h2><div id="priceTables"></div><button class="primary" id="savePricesBtn" type="button">Uložit ceník</button><button class="secondary" id="resetPricesBtn" type="button" style="width:100%;margin-top:7px">Obnovit výchozí ceny</button></div>
+</section>
+</main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+"use strict";
+
+const TB_PROJECT_URL="https://qoqxmmmijnqrkhmdhibg.supabase.co";
+const DOCS_BUCKET="zakazky-dokumentace";
+const VAT=.21;
+const company={lat:50.516953055556,lon:13.691732777778,formatted:"K Vinici 140, 435 21 Obrnice"};
+
+const defaultData={
+ categories:[
+  {id:"a",name:"Odtah do 2,2 t",km:21,extras:{manip:450,recovery:550,waiting:250}},
+  {id:"b",name:"Odtah 2,2–3,5 t",km:26,extras:{manip:450,recovery:550,waiting:250}},
+  {id:"c",name:"Odtah 2,2–3,5 t – nadrozměrná vozidla",km:32,extras:{manip:900,recovery:900,waiting:300}},
+  {id:"d",name:"Odtah nad 3,5–6,5 t",km:45,extras:{manip:1700,recovery:2000,waiting:500}}
+ ],
+ general:{weekend:250,night:600,holiday:600,difficult:350,secondVehicleKm:6.5,storageUnder35:150,storageOver35:50,transportPersonsKm:15}
+};
+
+function cloneDefault(){return typeof structuredClone==="function"?structuredClone(defaultData):JSON.parse(JSON.stringify(defaultData))}
+let data;
+try{data=JSON.parse(localStorage.getItem("odtahCenik2026")||"null")||cloneDefault()}catch(e){data=cloneDefault();localStorage.removeItem("odtahCenik2026")}
+if(!data.categories?.length)data=cloneDefault();
+if(!data.general)data.general=cloneDefault().general;
+if(data.general.holiday==null)data.general.holiday=600;
+
+let tbDispatch=null,map=null,routeLayer=null;
+const places={from:null,impact:null,to:null,return:null};
+const markers={from:null,impact:null,to:null,return:null};
+const timers={};
+let manualLimitOverride=false;
+let ocrDraft={caseNo:"",client:"",target:"",limit:null,limitMode:"",screenshots:0};
+
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat("cs-CZ",{maximumFractionDigits:2}).format(Number(n)||0)+" Kč";
+const money0=n=>new Intl.NumberFormat("cs-CZ",{maximumFractionDigits:0}).format(Number(n)||0)+" Kč";
+const pad2=n=>String(n).padStart(2,"0");
+const dateKey=d=>d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function current(){return data.categories[Math.max(0,Number($("category").value)||0)]||data.categories[0]}
+function cfg(){try{return JSON.parse(localStorage.getItem("tb_dispatch_config")||"{}")}catch(e){return{}}}
+function geoKey(){return localStorage.getItem("geoapifyApiKey")||""}
+function safePart(v){return String(v||"").trim().replace(/[^a-zA-Z0-9_-]/g,"_")}
+function jobLabel(j){return j?.cislo_zakazky||j?.id||"Zakázka"}
+function setStatus(id,msg,cls=""){const e=$(id);if(e){e.textContent=msg;e.className="status "+cls}}
+function makeJobNumber(){const d=new Date();return "TB-"+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+"-"+pad2(d.getHours())+pad2(d.getMinutes())+pad2(d.getSeconds())}
+
+function showTab(tab){
+ $("calc").classList.toggle("hidden",tab!=="calc");
+ $("settings").classList.toggle("hidden",tab!=="settings");
+ $("tabCalc").classList.toggle("active",tab==="calc");
+ $("tabSettings").classList.toggle("active",tab==="settings");
+ if(tab==="settings"){renderSettings();updateKeyStatus()}
+ if(tab==="calc"&&map)setTimeout(()=>map.invalidateSize(),100);
+}
+window.showTab=showTab;
+
+function setConnection(msg,ok=false){const e=$("dispatchConnectionStatus");e.textContent=msg;e.className="note "+(ok?"ok":"warn")}
+function keyHint(k){if(!k)return"klíč chybí";if(k.startsWith("sb_publishable_"))return"Publishable key ✓";if(k.startsWith("sb_secret_"))return"Secret key – nepoužívat v prohlížeči";if(k.startsWith("eyJ"))return"starý anon JWT";return"neznámý formát"}
+async function initDispatchSupabase(){
+ const c=cfg();
+ const url=String(c.url||TB_PROJECT_URL).trim();
+ const key=String(c.key||"").trim();
+ if(!key){
+  tbDispatch=null;
+  setConnection("Supabase zatím není nastavené.");
+  return false;
+ }
+ if(!window.supabase?.createClient){
+  tbDispatch=null;
+  setConnection("Supabase knihovna se nenačetla.");
+  return false;
+ }
+ if(key.startsWith("sb_secret_")){
+  tbDispatch=null;
+  setConnection("❌ Secret key není určený do prohlížeče.");
+  return false;
+ }
+ try{
+  // Stejný způsob připojení jako ve funkční aplikaci TowBrüx Driver:
+  // createClient(url, key) bez dalšího zpracování klíče.
+  tbDispatch=window.supabase.createClient(url,key);
+  setConnection("⏳ Ověřuji Supabase…");
+  const r=await tbDispatch.from("zakazky").select("id").limit(1);
+  if(r.error){
+   tbDispatch=null;
+   const msg=String(r.error.message||"chyba");
+   setConnection("❌ Supabase: "+msg);
+   return false;
+  }
+  setConnection("Supabase: připojeno ✓ • "+keyHint(key),true);
+  return true;
+ }catch(e){
+  console.error("Supabase Dispatch:",e);
+  tbDispatch=null;
+  setConnection("❌ Supabase: "+(e.message||"chyba"));
+  return false;
+ }
+}
+async function ensureSupabase(){return tbDispatch?true:await initDispatchSupabase()}
+async function saveDispatchConfig(){
+ const key=$("supabaseKey").value.trim(),driver=$("defaultDriver").value.trim()||"driver1";
+ if(!key){alert("Vlož Supabase Publishable key.");return}
+ if(key.startsWith("sb_secret_")){alert("Do Dispatch patří Publishable key, ne Secret key.");return}
+ localStorage.setItem("tb_dispatch_config",JSON.stringify({url:TB_PROJECT_URL,key,driver}));
+ $("dispatchDriver").value=driver;$("docsDriver").value=driver;
+ if(await initDispatchSupabase())alert("TowBrüx Dispatch připojeno ✓");
+}
+
+function renderCategory(){
+ $("category").innerHTML=data.categories.map((c,i)=>`<option value="${i}">${esc(c.name)}</option>`).join("");
+ $("catNote").textContent=money(current().km)+" / km";
+}
+function renderExtras(){
+ const c=current(),g=data.general;
+ $("extras").innerHTML=[
+  ["manip","Naložení / složení",c.extras.manip],
+  ["recovery","Vyproštění vozidla",c.extras.recovery],
+  ["waiting","Čekací doba – 30 min",c.extras.waiting],
+  ["difficult","Ztížená manipulace",g.difficult]
+ ].map(x=>`<div class="check"><input id="x_${x[0]}" type="checkbox"><label for="x_${x[0]}">${x[1]} (${money(x[2])})</label></div>`).join("")+
+ `<div class="grid" style="margin-top:8px">
+ <div><label>Druhé vozidlo – km</label><input id="secondKm" type="number" min="0" value="0"></div>
+ <div><label>Přeprava osob – km</label><input id="personsKm" type="number" min="0" value="0"></div>
+ <div><label>Uskladnění do 3,5 t – dny</label><input id="storageU" type="number" min="0" value="0"></div>
+ <div><label>Uskladnění nad 3,5 t – dny</label><input id="storageO" type="number" min="0" value="0"></div></div>`;
+ ["manip","recovery","waiting","difficult"].forEach(k=>$(("x_"+k)).addEventListener("change",calculate));
+ ["secondKm","personsKm","storageU","storageO"].forEach(id=>$(id).addEventListener("input",calculate));
+}
+function setting(label,path,val){return`<div><label>${label}</label><input data-path="${path}" type="number" step=".01" value="${val}"></div>`}
+function renderSettings(){
+ let h="";
+ data.categories.forEach((c,i)=>h+=`<div class="card"><h2>${esc(c.name)}</h2><div class="grid">${setting("Cena/km",`c.${i}.km`,c.km)}${setting("Naložení",`c.${i}.extras.manip`,c.extras.manip)}${setting("Vyproštění",`c.${i}.extras.recovery`,c.extras.recovery)}${setting("Čekání",`c.${i}.extras.waiting`,c.extras.waiting)}</div></div>`);
+ h+=`<div class="card"><h2>Ostatní</h2><div class="grid">${setting("Víkend","general.weekend",data.general.weekend)}${setting("Noc","general.night",data.general.night)}${setting("Svátek","general.holiday",data.general.holiday)}${setting("Ztížená manipulace","general.difficult",data.general.difficult)}${setting("Druhé vozidlo Kč/km","general.secondVehicleKm",data.general.secondVehicleKm)}${setting("Uskladnění do 3,5 t Kč/den","general.storageUnder35",data.general.storageUnder35)}${setting("Uskladnění nad 3,5 t Kč/den","general.storageOver35",data.general.storageOver35)}${setting("Přeprava osob Kč/km","general.transportPersonsKm",data.general.transportPersonsKm)}</div></div>`;
+ $("priceTables").innerHTML=h;
+}
+function savePrices(){
+ document.querySelectorAll("#settings input[data-path]").forEach(e=>{
+  const p=e.dataset.path.split("."),v=Number(e.value)||0;
+  if(p[0]==="c"){const c=data.categories[Number(p[1])];if(p[2]==="km")c.km=v;else c.extras[p[3]]=v}
+  else data.general[p[1]]=v;
+ });
+ localStorage.setItem("odtahCenik2026",JSON.stringify(data));renderCategory();renderExtras();calculate();showTab("calc");alert("Ceník byl uložen.");
+}
+function resetPrices(){if(confirm("Obnovit výchozí ceny?")){data=cloneDefault();localStorage.setItem("odtahCenik2026",JSON.stringify(data));renderCategory();renderExtras();renderSettings();calculate()}}
+
+const fixedHolidays={"01-01":"Nový rok","05-01":"Svátek práce","05-08":"Den vítězství","07-05":"Cyril a Metoděj","07-06":"Jan Hus","09-28":"Den české státnosti","10-28":"Vznik ČSR","11-17":"Den boje za svobodu","12-24":"Štědrý den","12-25":"1. svátek vánoční","12-26":"2. svátek vánoční"};
+function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return new Date(y,mo-1,da)}
+function isHoliday(d){const f=pad2(d.getMonth()+1)+"-"+pad2(d.getDate());if(fixedHolidays[f])return true;const e=easter(d.getFullYear()),g=new Date(e),m=new Date(e);g.setDate(e.getDate()-2);m.setDate(e.getDate()+1);return dateKey(d)===dateKey(g)||dateKey(d)===dateKey(m)}
+function serviceDate(){const ds=$("serviceDate").value,ts=$("serviceTime").value;if(!ds||!ts)return new Date();const [y,m,d]=ds.split("-").map(Number),[h,mi]=ts.split(":").map(Number);return new Date(y,m-1,d,h,mi)}
+function renderAuto(){
+ const d=serviceDate(),g=data.general,w=d.getDay()===0||d.getDay()===6,n=d.getHours()*60+d.getMinutes(),night=n>=1260||n<360,h=isHoliday(d);
+ $("autoSurcharges").innerHTML=`<div class="check"><input type="checkbox" disabled ${w?"checked":""}><label>${w?"🟢":"⚪"} Víkend +${money(w?g.weekend:0)}</label></div><div class="check"><input type="checkbox" disabled ${night?"checked":""}><label>${night?"🟢":"⚪"} Noc 21:00–06:00 +${money(night?g.night:0)}</label></div><div class="check"><input type="checkbox" disabled ${h?"checked":""}><label>${h?"🟢":"⚪"} Svátek +${money(h?g.holiday:0)}</label></div>`;
+ return{w,night,h};
+}
+function calculate(){
+ const c=current(),g=data.general,km=Number($("km").value)||0,limit=Number($("limit").value)||0,a=renderAuto();let ex=0;
+ [["manip",c.extras.manip],["recovery",c.extras.recovery],["waiting",c.extras.waiting],["difficult",g.difficult]].forEach(([k,v])=>{if($("x_"+k)?.checked)ex+=v});
+ if(a.w)ex+=g.weekend;if(a.night)ex+=g.night;if(a.h)ex+=g.holiday;
+ ex+=(Number($("secondKm")?.value)||0)*g.secondVehicleKm;
+ ex+=(Number($("personsKm")?.value)||0)*g.transportPersonsKm;
+ ex+=(Number($("storageU")?.value)||0)*g.storageUnder35;
+ ex+=(Number($("storageO")?.value)||0)*g.storageOver35;
+ const base=km*c.km,total=base+ex,totalVat=total*(1+VAT);
+ $("baseOut").textContent=money(base);$("extrasOut").textContent=money(ex);$("totalOut").textContent=money(total);$("totalVatOut").textContent=money(totalVat);
+ if(ocrDraft.limitMode==="real"&&!manualLimitOverride){$("realCostsNote").classList.remove("hidden");$("limitOut").textContent="Reálné náklady";$("resultOut").textContent="—";$("resultVatOut").textContent="—";$("resultLabel").textContent="LIMIT KLIENTA";$("resultVatLabel").textContent="DOPLATEK SE NEPOUŽÍVÁ"}
+ else{$("realCostsNote").classList.add("hidden");const d=total-limit;$("limitOut").textContent=money(limit);$("resultOut").textContent=money(Math.abs(d));$("resultVatOut").textContent=money(Math.abs(d*(1+VAT)));$("resultLabel").textContent=d>=0?"DOPLATEK KLIENTA – BEZ DPH":"PŘEPLATEK KLIENTA – BEZ DPH";$("resultVatLabel").textContent=d>=0?"DOPLATEK KLIENTA – S DPH":"PŘEPLATEK KLIENTA – S DPH"}
+}
+
+function initMap(){
+ if(map||!window.L)return;
+ map=L.map("map").setView([49.8175,15.473],7);
+ const k=geoKey(),url=k?`https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}.png?apiKey=${encodeURIComponent(k)}`:"https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+ L.tileLayer(url,{maxZoom:20,attribution:k?'Powered by <a href="https://www.geoapify.com/">Geoapify</a>':"© OpenStreetMap"}).addTo(map);
+}
+function saveGeoKey(){const k=$("geoKey").value.trim();if(!k){alert("Vlož Geoapify API klíč.");return}localStorage.setItem("geoapifyApiKey",k);updateKeyStatus();if(map){map.remove();map=null}initMap();alert("Geoapify API klíč byl uložen.")}
+function updateKeyStatus(){const e=$("keyStatus"),k=geoKey();e.textContent=k?"API klíč je uložen v tomto zařízení.":"API klíč zatím není uložen.";e.className="note "+(k?"ok":"warn");if(!$("geoKey").value)$("geoKey").value=k}
+async function geocode(text){const k=geoKey();if(!k||!text)return null;const r=await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(text)}&lang=cs&filter=countrycode:cz&limit=1&format=json&apiKey=${encodeURIComponent(k)}`);if(!r.ok)throw Error("HTTP "+r.status);const j=await r.json(),p=j.results?.[0];return p?{lat:Number(p.lat),lon:Number(p.lon),formatted:p.formatted||text}:null}
+function setPlace(which,p){places[which]=p;$(`${which}Address`).value=p.formatted||"";$(`${which}Status`).textContent="✅ "+(p.formatted||"Nastaveno");$(`${which}Status`).className="note ok";showPlace(which,p)}
+function showPlace(which,p){initMap();if(markers[which])map.removeLayer(markers[which]);markers[which]=L.marker([p.lat,p.lon]).addTo(map).bindPopup(esc(p.formatted||"")).openPopup();const pts=Object.values(places).filter(Boolean).map(x=>[x.lat,x.lon]);if(pts.length>1)map.fitBounds(pts,{padding:[25,25]});else map.setView([p.lat,p.lon],15)}
+function choosePlace(which,p){setPlace(which,{lat:Number(p.lat),lon:Number(p.lon),formatted:p.formatted||p.address_line1||""})}
+async function useGPS(which){
+ const s=$(`${which}Status`);if(!navigator.geolocation){s.textContent="Poloha není podporována.";return}
+ s.textContent="📍 Zjišťuji polohu…";navigator.geolocation.getCurrentPosition(async pos=>{let p={lat:pos.coords.latitude,lon:pos.coords.longitude,formatted:`GPS ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`};const k=geoKey();if(k)try{const r=await fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${p.lat}&lon=${p.lon}&lang=cs&format=json&apiKey=${encodeURIComponent(k)}`),j=await r.json();p.formatted=j.results?.[0]?.formatted||p.formatted}catch(e){}choosePlace(which,p)},()=>{s.textContent="Poloha nebyla povolena.";s.className="note error"},{enableHighAccuracy:true,timeout:15000,maximumAge:30000})
+}
+function useCompany(which){choosePlace(which,company)}
+async function suggest(which){
+ const k=geoKey(),input=$(`${which}Address`),box=$(`${which}Suggestions`),q=input.value.trim();if(!k||q.length<3){box.classList.add("hidden");return}
+ try{const r=await fetch(`https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(q)}&lang=cs&filter=countrycode:cz&limit=5&format=json&apiKey=${encodeURIComponent(k)}`),j=await r.json();box.innerHTML=(j.results||[]).map(p=>`<div class="suggestion">${esc(p.formatted||p.address_line1||"Adresa")}</div>`).join("");box.querySelectorAll(".suggestion").forEach((el,i)=>el.onclick=()=>{choosePlace(which,j.results[i]);box.classList.add("hidden")});box.classList.toggle("hidden",!(j.results||[]).length)}catch(e){box.classList.add("hidden")}
+}
+async function calculateRoute(){
+ const k=geoKey();if(!k){setStatus("routeStatus","Nejdřív vlož Geoapify API klíč v Ceník / mapa.","warn");showTab("settings");return}
+ if(!places.from||!places.impact||!places.to||!places.return){setStatus("routeStatus","Nejdřív nastav výjezd, zásah, servis a návrat.","warn");return}
+ setStatus("routeStatus","⏳ Počítám celou pracovní trasu…");
+ try{
+  const pts=[places.from,places.impact,places.to,places.return],names=["Výjezd","Zásah","Servis","Návrat"];let totalM=0,totalSec=0,features=[];
+  for(let i=0;i<3;i++){const w=`${pts[i].lat},${pts[i].lon}|${pts[i+1].lat},${pts[i+1].lon}`,r=await fetch(`https://api.geoapify.com/v1/routing?waypoints=${encodeURIComponent(w)}&mode=light_truck&type=balanced&format=geojson&apiKey=${encodeURIComponent(k)}`);if(!r.ok)throw Error("HTTP "+r.status);const j=await r.json(),f=j.features?.[0];if(!f)throw Error("trasa");features.push(f);totalM+=Number(f.properties?.distance)||0;totalSec+=Number(f.properties?.time)||0}
+  if(routeLayer)map.removeLayer(routeLayer);routeLayer=L.featureGroup();features.forEach(f=>L.geoJSON(f,{style:{weight:5,opacity:.85}}).addTo(routeLayer));routeLayer.addTo(map);map.fitBounds(routeLayer.getBounds(),{padding:[25,25]});
+  const km=Math.round(totalM/100)/10;$("km").value=km;calculate();document.querySelector(".tripLegs")?.remove();
+  const box=document.createElement("div");box.className="tripLegs";box.innerHTML=`<div class="tripTotal"><b>Celá pracovní trasa</b><span>${km.toLocaleString("cs-CZ",{maximumFractionDigits:1})} km</span></div>`+features.map((f,i)=>`<div class="tripLeg"><span>${names[i]} → ${names[i+1]}<br><small>${Math.round((Number(f.properties?.time)||0)/60)} min</small></span><b>${((Number(f.properties?.distance)||0)/1000).toLocaleString("cs-CZ",{maximumFractionDigits:1})} km</b></div>`).join("");$("routeStatus").after(box);setStatus("routeStatus",`Celá trasa: ${km.toLocaleString("cs-CZ",{maximumFractionDigits:1})} km • cca ${Math.round(totalSec/60)} min.`,"ok")
+ }catch(e){console.error(e);setStatus("routeStatus","❌ Výpočet trasy se nepodařil. Zkontroluj API klíč a adresy.","error")}
+}
+function clearRoute(){["from","impact","to","return"].forEach(k=>{places[k]=null;$(`${k}Address`).value="";$(`${k}Status`).textContent="";if(markers[k]&&map){map.removeLayer(markers[k]);markers[k]=null}});if(routeLayer&&map){map.removeLayer(routeLayer);routeLayer=null}document.querySelector(".tripLegs")?.remove();$("km").value=0;calculate();setStatus("routeStatus","Zadej výjezd, zásah, servis a návrat.")}
+
+function extractCase(t){return(String(t).match(/(?:Číslo|Cislo)\s+případu\s*[:\-]?\s*([A-Z0-9][A-Z0-9._\/-]*)/i)||[])[1]||((String(t).match(/\bT\d{6,}\.\d+\b/i)||[])[0]||"")}
+function extractLimit(t){const raw=String(t);if(/reáln[eé]\s+n[aá]klady/i.test(raw)||/realne\s+naklady/i.test(raw.normalize("NFD").replace(/[\u0300-\u036f]/g,"")))return{mode:"real",value:null};const m=raw.match(/(?:finan[cč]n[ií]\s+limit|limit\s+klienta)[^\d]{0,80}(\d[\d .]*)(?:[,.]\d{2})?\s*(?:CZK|K[cč])?/i);if(m)return{mode:"amount",value:Number(m[1].replace(/[ .]/g,""))};return{mode:"",value:null}}
+function parseText(t){const caseNo=extractCase(t),lim=extractLimit(t),client=((t.match(/Lokace klienta\s*[:\-]?\s*([\s\S]*?)(?=Cílové místo|Cilove misto|Událost|Udalost|$)/i)||[])[1]||"").replace(/\s+/g," ").trim(),target=((t.match(/Cílové místo(?: odtahu)?\s*[:\-]?\s*([\s\S]*?)(?=Událost|Udalost|Finanční limit|Financni limit|Limit|$)/i)||[])[1]||"").replace(/\s+/g," ").trim();return{caseNo,client,target,limit:lim.value,limitMode:lim.mode}}
+function renderOCR(){const e=$("ocrDraft");if(!ocrDraft.caseNo&&!ocrDraft.client&&!ocrDraft.target&&!ocrDraft.limitMode){e.classList.add("hidden");e.innerHTML="";return}e.classList.remove("hidden");const lim=ocrDraft.limitMode==="real"?"REÁLNÉ NÁKLADY":ocrDraft.limitMode==="amount"?money0(ocrDraft.limit):"nenačten";e.innerHTML=`<div class="status"><b>📄 Rozpracovaná zakázka</b><br>Číslo: <b>${esc(ocrDraft.caseNo||"nenalezeno")}</b><br>Zásah: <b>${esc(ocrDraft.client||"nenalezen")}</b><br>Servis: <b>${esc(ocrDraft.target||"nenalezen")}</b><br>Limit: <b>${lim}</b><br>Screenshoty: <b>${ocrDraft.screenshots}</b><br><br><button class="secondary" id="newOcrBtn" type="button">🗑️ Nová zakázka</button></div>`;$("newOcrBtn").onclick=()=>{ocrDraft={caseNo:"",client:"",target:"",limit:null,limitMode:"",screenshots:0};manualLimitOverride=false;$("dispatchJobNo").value="";renderOCR();calculate()}}
+function mergeOCR(d){if(d.caseNo&&!ocrDraft.caseNo)ocrDraft.caseNo=d.caseNo;if(d.client&&!ocrDraft.client)ocrDraft.client=d.client;if(d.target&&!ocrDraft.target)ocrDraft.target=d.target;if(d.limitMode&&!ocrDraft.limitMode&&!manualLimitOverride){ocrDraft.limitMode=d.limitMode;ocrDraft.limit=d.limit}ocrDraft.screenshots++;$("dispatchJobNo").value=ocrDraft.caseNo||"";if(ocrDraft.client)geocode(ocrDraft.client).then(p=>p&&choosePlace("impact",p)).catch(()=>{});if(ocrDraft.target)geocode(ocrDraft.target).then(p=>p&&choosePlace("to",p)).catch(()=>{});if(!manualLimitOverride&&ocrDraft.limitMode==="amount")$("limit").value=ocrDraft.limit||0;if(!manualLimitOverride&&ocrDraft.limitMode==="real")$("limit").value=0;renderOCR();calculate()}
+async function runOCR(file){if(!window.Tesseract){setStatus("ocrStatus","OCR se nenačetlo.","error");return}try{setStatus("ocrStatus","🔎 Čtu screenshot…");const r=await Tesseract.recognize(file,"ces+eng",{logger:m=>{if(m.status==="recognizing text"&&m.progress)setStatus("ocrStatus",`🔎 Čtu screenshot… ${Math.round(m.progress*100)} %`)}});const d=parseText(r.data.text);mergeOCR(d);setStatus("ocrStatus",(d.caseNo||d.client||d.target||d.limitMode)?"✅ Screenshot přidán.":"⚠️ Screenshot přečten, ale údaje nebyly nalezeny.",(d.caseNo||d.client||d.target||d.limitMode)?"ok":"warn")}catch(e){console.error(e);setStatus("ocrStatus","❌ Screenshot se nepodařilo přečíst.","error")}}
+async function pasteOrder(){try{const t=await navigator.clipboard.readText();if(!t.trim())throw Error();$("orderText").value=t;parseOrderText()}catch(e){$("importArea").classList.remove("hidden");$("orderText").focus();$("importStatus").textContent="Safari schránku nepovolil automaticky. Vlož text ručně."}}
+function parseOrderText(){const t=$("orderText").value.trim();if(!t){$("importStatus").textContent="Nejdřív vlož text zakázky.";return}mergeOCR(parseText(t));$("importStatus").textContent="✅ Údaje byly přidány."}
+
+async function sendJob(){
+ const driver=$("dispatchDriver").value.trim()||cfg().driver||"driver1",impact=$("impactAddress").value.trim(),service=$("toAddress").value.trim(),from=$("fromAddress").value.trim(),ret=$("returnAddress").value.trim(),jobNo=$("dispatchJobNo").value.trim()||ocrDraft.caseNo||makeJobNumber();
+ if(!impact||!service){setStatus("dispatchStatus","❌ Chybí zásah nebo servis.","error");return}
+ if(!(await ensureSupabase())){showTab("settings");setStatus("dispatchStatus","❌ Supabase není připravené.","error");return}
+ const btn=$("sendBtn");btn.disabled=true;setStatus("dispatchStatus","⏳ Odesílám zakázku…");
+ try{
+  const r=await tbDispatch.from("zakazky").insert({cislo_zakazky:jobNo,klient:"",zasah:impact,servis:service,poznamka:[from?`Výjezd: ${from}`:"",ret?`Návrat: ${ret}`:"",`Vozidlo: ${current().name}`,`Vzdálenost: ${$("km").value||0} km`,`Limit: ${ocrDraft.limitMode==="real"&&!manualLimitOverride?"Reálné náklady":money0(Number($("limit").value)||0)}`].filter(Boolean).join(" | "),stav:"nova",ridic_id:driver}).select().single();
+  if(r.error)throw r.error;$("docsDriver").value=driver;setStatus("dispatchStatus",`✅ Zakázka ${jobLabel(r.data)} odeslána řidiči ${driver}.`,"ok")
+ }catch(e){console.error(e);setStatus("dispatchStatus","❌ Zakázku se nepodařilo odeslat: "+(e.message||"chyba"),"error")}finally{btn.disabled=false}
+}
+
+const DOCS=[["foto1","Foto 1","Celé vozidlo"],["foto2","Foto 2","Přední část"],["foto3","Foto 3","Zadní část"],["foto4","Foto 4","Poškození"],["foto5","Foto 5","Další detail"],["list","Zakázkový list","Dokument"]];
+function selectedJob(){const o=$("docsJobSelect").selectedOptions[0];try{return o?.dataset.job?JSON.parse(o.dataset.job):null}catch(e){return null}}
+async function loadJobs(){
+ if(!(await ensureSupabase())){setStatus("docsStatus","❌ Supabase není připravené.","error");return}
+ const driver=$("docsDriver").value.trim()||"driver1",sel=$("docsJobSelect");sel.innerHTML="<option>⏳ Načítám…</option>";$("deleteJobButton").disabled=true;setStatus("docsStatus","⏳ Načítám zakázky…");
+ try{
+  const r=await tbDispatch.from("zakazky").select("id,cislo_zakazky,ridic_id,stav,zasah,servis").eq("ridic_id",driver).limit(100);if(r.error)throw r.error;const jobs=r.data||[];jobs.sort((a,b)=>String(b.cislo_zakazky||b.id).localeCompare(String(a.cislo_zakazky||a.id)));sel.innerHTML='<option value="">Vyber zakázku…</option>';jobs.forEach(j=>{const o=document.createElement("option");o.value=j.id;o.textContent=`${jobLabel(j)} • ${j.stav||"—"}`;o.dataset.job=JSON.stringify(j);sel.appendChild(o)});setStatus("docsStatus",jobs.length?`✅ Načteno ${jobs.length} zakázek. Vyber jednu.`:`Pro řidiče ${driver} nebyly nalezeny žádné zakázky.`,jobs.length?"ok":"warn")
+ }catch(e){sel.innerHTML='<option value="">Chyba načtení</option>';setStatus("docsStatus","❌ Zakázky se nepodařilo načíst: "+(e.message||"chyba"),"error")}
+}
+async function showDocs(){
+ if(!(await ensureSupabase())){setStatus("docsStatus","❌ Supabase není připravené.","error");return}
+ const job=selectedJob();if(!job){setStatus("docsStatus","⚠️ Nejdřív vyber zakázku.","warn");return}
+ $("deleteJobButton").disabled=false;const folder=`${safePart(job.ridic_id)}/${safePart(job.id)}`;$("docsJobInfo").classList.remove("hidden");$("docsJobInfo").innerHTML=`<b>Zakázka:</b> ${esc(jobLabel(job))}<br><b>Stav:</b> ${esc(job.stav||"—")}<br><b>Zásah:</b> ${esc(job.zasah||"—")}<br><b>Servis:</b> ${esc(job.servis||"—")}`;$("docsGrid").innerHTML="";setStatus("docsStatus","⏳ Načítám dokumentaci…");
+ try{
+  const r=await tbDispatch.storage.from(DOCS_BUCKET).list(folder,{limit:100,offset:0,sortBy:{column:"name",order:"asc"}});if(r.error)throw r.error;const files=r.data||[];let count=0;
+  DOCS.forEach(([key,title,desc])=>{const f=files.find(x=>["jpg","jpeg","png","webp"].some(ext=>x.name===key+"."+ext));if(!f){const d=document.createElement("div");d.className="docItem";d.innerHTML=`<div class="missing">📭<br>${title}<br>nenahráno</div><div class="docTitle">${title}</div><div class="docMeta">${desc}</div>`;$("docsGrid").appendChild(d);return}count++;const path=`${folder}/${f.name}`,url=tbDispatch.storage.from(DOCS_BUCKET).getPublicUrl(path).data.publicUrl,d=document.createElement("div");d.className="docItem";d.innerHTML=`<a href="${esc(url)}" target="_blank" rel="noopener"><img src="${esc(url)}" alt="${esc(title)}"></a><div class="docTitle">${title}</div><div class="docMeta">${desc}</div><div class="docButtons"><button class="secondary" type="button">🔍 Otevřít</button><button class="secondary" type="button">⬇️ Stáhnout</button></div>`;d.querySelectorAll("button")[0].onclick=()=>window.open(url,"_blank","noopener");d.querySelectorAll("button")[1].onclick=()=>window.open(url+(url.includes("?")?"&":"?")+"download","_blank","noopener");$("docsGrid").appendChild(d)});
+  setStatus("docsStatus",`✅ Dokumentace: ${count} / 6 souborů.`,count===6?"ok":"warn")
+ }catch(e){setStatus("docsStatus","❌ Dokumentaci se nepodařilo načíst: "+(e.message||"chyba"),"error")}
+}
+function confirmDelete(label){return new Promise(resolve=>{const ov=$("confirmOverlay"),yes=$("confirmDelete"),no=$("confirmCancel");$("confirmText").innerHTML=`Opravdu smazat zakázku <b>${esc(label)}</b> včetně dokumentace?<br><br>Tato akce je nevratná.`;ov.classList.remove("hidden");const cleanup=()=>{ov.classList.add("hidden");yes.onclick=null;no.onclick=null};yes.onclick=()=>{cleanup();resolve(true)};no.onclick=()=>{cleanup();resolve(false)}})}
+async function deleteSelectedJob(){
+ if(!(await ensureSupabase())){setStatus("docsStatus","❌ Supabase není připravené.","error");return}
+ const job=selectedJob();if(!job){setStatus("docsStatus","⚠️ Nejdřív vyber zakázku.","warn");return}
+ if(!(await confirmDelete(jobLabel(job))))return;
+ const btn=$("deleteJobButton");btn.disabled=true;setStatus("docsStatus","⏳ Mažu dokumentaci a zakázku…");
+ try{
+  const folder=`${safePart(job.ridic_id)}/${safePart(job.id)}`,list=await tbDispatch.storage.from(DOCS_BUCKET).list(folder,{limit:100,offset:0});
+  if(list.error)throw Error("Dokumentaci se nepodařilo načíst: "+list.error.message);
+  const paths=(list.data||[]).map(f=>`${folder}/${f.name}`);if(paths.length){const sr=await tbDispatch.storage.from(DOCS_BUCKET).remove(paths);if(sr.error)throw Error("Dokumentaci se nepodařilo smazat: "+sr.error.message)}
+  const db=await tbDispatch.from("zakazky").delete().eq("id",job.id);if(db.error)throw Error("Dokumentace byla odstraněna, ale zakázku se nepodařilo odstranit z databáze: "+db.error.message);
+  $("docsJobSelect").value="";$("docsGrid").innerHTML="";$("docsJobInfo").classList.add("hidden");setStatus("docsStatus",`✅ Zakázka ${jobLabel(job)} a její dokumentace byly smazány.`,"ok");await loadJobs()
+ }catch(e){console.error(e);btn.disabled=false;setStatus("docsStatus","❌ Mazání se nepodařilo dokončit: "+(e.message||"chyba"),"error")}
+}
+
+function init(){
+ $("tabCalc").addEventListener("click",()=>showTab("calc"));$("tabSettings").addEventListener("click",()=>showTab("settings"));
+ $("pickScreenshot").addEventListener("click",()=>$("jobImage").click());$("jobImage").addEventListener("change",e=>e.target.files[0]&&runOCR(e.target.files[0]));
+ $("pasteBtn").addEventListener("click",pasteOrder);$("manualBtn").addEventListener("click",()=>$("importArea").classList.toggle("hidden"));$("parseBtn").addEventListener("click",parseOrderText);
+ $("km").addEventListener("input",calculate);$("limit").addEventListener("input",()=>{manualLimitOverride=true;ocrDraft.limitMode="manual";calculate()});$("category").addEventListener("change",()=>{renderExtras();$("catNote").textContent=money(current().km)+" / km";calculate()});
+ $("serviceDate").addEventListener("change",calculate);$("serviceTime").addEventListener("change",calculate);$("recalcBtn").addEventListener("click",calculate);
+ $("routeBtn").addEventListener("click",calculateRoute);$("clearRouteBtn").addEventListener("click",clearRoute);$("sendBtn").addEventListener("click",sendJob);
+ $("loadJobsBtn").addEventListener("click",loadJobs);$("showDocsBtn").addEventListener("click",showDocs);$("deleteJobButton").addEventListener("click",deleteSelectedJob);
+ $("docsDriver").addEventListener("change",()=>{$("docsJobSelect").innerHTML='<option value="">Načti zakázky pro tohoto řidiče</option>';$("docsGrid").innerHTML="";$("deleteJobButton").disabled=true});
+ $("saveGeoBtn").addEventListener("click",saveGeoKey);$("saveSupabaseBtn").addEventListener("click",saveDispatchConfig);$("testSupabaseBtn").addEventListener("click",initDispatchSupabase);$("savePricesBtn").addEventListener("click",savePrices);$("resetPricesBtn").addEventListener("click",resetPrices);
+ ["from","impact","to","return"].forEach(which=>{$(`${which}Address`).addEventListener("input",()=>{clearTimeout(timers[which]);timers[which]=setTimeout(()=>suggest(which),300)});$(`[data-gps="${which}"]`).addEventListener("click",()=>useGPS(which));$(`[data-home="${which}"]`).addEventListener("click",()=>useCompany(which))});
+ document.addEventListener("click",e=>{if(!e.target.closest(".addressBox"))document.querySelectorAll(".suggestions").forEach(x=>x.classList.add("hidden"))});
+ const now=new Date();$("serviceDate").value=dateKey(now);$("serviceTime").value=pad2(now.getHours())+":"+pad2(now.getMinutes());
+ renderCategory();renderExtras();renderSettings();updateKeyStatus();calculate();initMap();
+ const c=cfg();if(c.key){$("supabaseKey").value=c.key;$("defaultDriver").value=c.driver||"driver1";$("dispatchDriver").value=c.driver||"driver1";$("docsDriver").value=c.driver||"driver1";initDispatchSupabase()}else setConnection("Supabase zatím není nastavené.");
+ if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=20260917-dispatch").catch(console.warn));
+}
+window.addEventListener("error",e=>console.error("TowBrüx Dispatch error:",e.error||e.message));
+window.addEventListener("unhandledrejection",e=>console.error("TowBrüx Dispatch promise:",e.reason));
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+</script>
+</body>
+</html>
