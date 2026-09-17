@@ -591,6 +591,70 @@ color:#ffd04a!important
 color:#ff7773!important
 }
 
+/* =========================================================
+   VLASTNÍ POTVRZENÍ SMAZÁNÍ
+   ========================================================= */
+
+.confirmOverlay{
+position:fixed;
+inset:0;
+z-index:99999;
+background:#000c;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:18px
+}
+
+.confirmBox{
+width:100%;
+max-width:430px;
+background:#111720;
+border:1px solid #66500b;
+border-radius:20px;
+padding:18px;
+box-shadow:0 20px 60px #000c
+}
+
+.confirmBox h3{
+margin:0 0 10px;
+font-size:18px
+}
+
+.confirmBox p{
+margin:0;
+color:var(--m);
+font-size:13px;
+line-height:1.5
+}
+
+.confirmActions{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+margin-top:16px
+}
+
+.confirmActions button{
+width:100%;
+min-height:48px;
+border-radius:14px;
+font-weight:900;
+font-size:14px
+}
+
+.confirmCancel{
+border:1px solid var(--l);
+background:#202a36;
+color:#fff
+}
+
+.confirmDelete{
+border:1px solid #8b3035;
+background:#59191d;
+color:#fff
+}
+
 @media(max-width:520px){
 .grid{grid-template-columns:1fr}
 #extras{grid-template-columns:1fr}
@@ -604,35 +668,95 @@ color:#ff7773!important
 .docsGrid{grid-template-columns:1fr}
 .docsToolbar{grid-template-columns:1fr}
 .ocrActions{grid-template-columns:1fr}
+.confirmActions{grid-template-columns:1fr}
 }
 </style>
 </head>
 
 <body>
+
+<!-- VLASTNÍ POTVRZENÍ SMAZÁNÍ -->
+<div id="confirmOverlay" class="confirmOverlay hidden">
+
+<div class="confirmBox">
+
+<h3>🗑️ Potvrdit smazání</h3>
+
+<p id="confirmText">
+Opravdu chceš tuto zakázku smazat?
+</p>
+
+<div class="confirmActions">
+
+<button
+id="confirmCancel"
+class="confirmCancel"
+type="button">
+ZRUŠIT
+</button>
+
+<button
+id="confirmDelete"
+class="confirmDelete"
+type="button">
+🗑️ ANO, SMAZAT
+</button>
+
+</div>
+
+</div>
+
+</div>
+
 <div class="app">
 
 <header>
+
 <div class="brand">
-<img src="icon.svg" class="logo" onerror="this.style.display='none'">
+
+<img
+src="icon.svg"
+class="logo"
+onerror="this.style.display='none'">
+
 <div>
+
 <b>Tow<span>Brüx</span> Dispatch</b>
-<div class="sub">Dispečink • správa a odesílání zakázek řidičům</div>
+
+<div class="sub">
+Dispečink • správa a odesílání zakázek řidičům
 </div>
+
 </div>
+
+</div>
+
 </header>
 
 <nav>
-<button id="tabCalc" class="active" onclick="showTab('calc')">🧮 Výpočet</button>
-<button id="tabSettings" onclick="showTab('settings')">⚙️ Ceník / mapa</button>
+
+<button
+id="tabCalc"
+class="active"
+onclick="showTab('calc')">
+🧮 Výpočet
+</button>
+
+<button
+id="tabSettings"
+onclick="showTab('settings')">
+⚙️ Ceník / mapa
+</button>
+
 </nav>
 
 <main>
 
 <section id="calc">
 
-<!-- =========================
+<!-- =====================================================
      OCR
-     ========================= -->
+     ===================================================== -->
 
 <section class="card importCard">
 
@@ -657,22 +781,32 @@ onclick="document.getElementById('jobImage').click()">
 📷 VYBRAT SCREENSHOT ZAKÁZKY
 </button>
 
-<div id="ocrStatus" class="routeStatus">
+<div
+id="ocrStatus"
+class="routeStatus">
 Čeká na screenshot zakázky.
 </div>
 
-<div id="ocrDraft" class="hidden"></div>
+<div
+id="ocrDraft"
+class="hidden">
+</div>
 
-<div id="ocrPreview" class="hidden" style="margin-top:8px"></div>
+<div
+id="ocrPreview"
+class="hidden"
+style="margin-top:8px">
+</div>
 
 </section>
 
-
-<!-- =========================
+<!-- =====================================================
      TEXT IMPORT
-     ========================= -->
+     ===================================================== -->
 
-<div class="card" id="importCard">
+<div
+class="card"
+id="importCard">
 
 <div class="importTitle">
 📋 Rychlé načtení zakázky
@@ -686,17 +820,24 @@ Text může být také doplňkem k již načteným screenshotům.
 
 <div class="importBtns">
 
-<button class="primary" onclick="pasteOrder()">
+<button
+class="primary"
+onclick="pasteOrder()">
 📋 Vložit zakázku
 </button>
 
-<button class="secondary" onclick="toggleImportText()">
+<button
+class="secondary"
+onclick="toggleImportText()">
 ✍️ Vložit ručně
 </button>
 
 </div>
 
-<div id="importArea" class="hidden" style="margin-top:8px">
+<div
+id="importArea"
+class="hidden"
+style="margin-top:8px">
 
 <textarea
 id="orderText"
@@ -712,14 +853,16 @@ Načíst údaje ze zakázky
 
 </div>
 
-<div id="importStatus" class="note"></div>
+<div
+id="importStatus"
+class="note">
+</div>
 
 </div>
 
-
-<!-- =========================
+<!-- =====================================================
      VEHICLE
-     ========================= -->
+     ===================================================== -->
 
 <div class="card">
 
@@ -734,32 +877,65 @@ id="category"
 onchange="renderCategoryNote();renderExtras();calculate();routeIfReady()">
 </select>
 
-<div class="grid" style="margin-top:8px">
+<div
+class="grid"
+style="margin-top:8px">
 
 <div>
-<label>Vzdálenost odtahu (km)</label>
-<input id="km" type="number" min="0" step="0.1" value="0" oninput="calculate()">
+
+<label>
+Vzdálenost odtahu (km)
+</label>
+
+<input
+id="km"
+type="number"
+min="0"
+step="0.1"
+value="0"
+oninput="calculate()">
+
 </div>
 
 <div>
-<label>Limit klienta (Kč bez DPH)</label>
-<input id="limit" type="number" min="0" step="1" value="1652" oninput="setManualLimit();calculate()">
-</div>
+
+<label>
+Limit klienta (Kč bez DPH)
+</label>
+
+<input
+id="limit"
+type="number"
+min="0"
+step="1"
+value="1652"
+oninput="setManualLimit();calculate()">
 
 </div>
 
-<div id="realCostsNote" class="note hidden">
-💰 Limit klienta: <b class="realCosts">Reálné náklady</b>
 </div>
 
-<p id="catNote" class="note"></p>
+<div
+id="realCostsNote"
+class="note hidden">
+
+💰 Limit klienta:
+<b class="realCosts">
+Reálné náklady
+</b>
 
 </div>
 
+<p
+id="catNote"
+class="note">
+</p>
 
-<!-- =========================
+</div>
+
+<!-- =====================================================
      ROUTE
-     ========================= -->
+     ===================================================== -->
 
 <div class="card">
 
@@ -775,125 +951,223 @@ Zásah a servis se načtou ze zakázky.
 
 <div class="addressBox">
 
-<label>🚚 1. Výjezd</label>
+<label>
+🚚 1. Výjezd
+</label>
 
 <div class="addressRow">
 
 <div class="addressBox">
 
-<input id="fromAddress" autocomplete="off" placeholder="Zadej adresu výjezdu">
+<input
+id="fromAddress"
+autocomplete="off"
+placeholder="Zadej adresu výjezdu">
 
-<div id="fromSuggestions" class="suggestions hidden"></div>
+<div
+id="fromSuggestions"
+class="suggestions hidden">
+</div>
 
 </div>
 
-<button class="iconBtn" type="button" title="Moje poloha" onclick="useMyLocation('from')">📍</button>
+<button
+class="iconBtn"
+type="button"
+title="Moje poloha"
+onclick="useMyLocation('from')">
+📍
+</button>
 
-<button class="iconBtn home" type="button" title="Sídlo firmy" onclick="useCompany('from')">🏠</button>
+<button
+class="iconBtn home"
+type="button"
+title="Sídlo firmy"
+onclick="useCompany('from')">
+🏠
+</button>
 
 </div>
 
-<div id="fromStatus" class="note">
+<div
+id="fromStatus"
+class="note">
 Výjezd zatím není zadaný.
 </div>
 
 </div>
 
+<div
+class="addressBox"
+style="margin-top:9px">
 
-<div class="addressBox" style="margin-top:9px">
-
-<label>📍 2. Zásah klienta</label>
+<label>
+📍 2. Zásah klienta
+</label>
 
 <div class="addressRow">
 
 <div class="addressBox">
 
-<input id="impactAddress" autocomplete="off" placeholder="Načte se ze zakázky">
+<input
+id="impactAddress"
+autocomplete="off"
+placeholder="Načte se ze zakázky">
 
-<div id="impactSuggestions" class="suggestions hidden"></div>
+<div
+id="impactSuggestions"
+class="suggestions hidden">
+</div>
 
 </div>
 
-<button class="iconBtn" type="button" title="Moje poloha" onclick="useMyLocation('impact')">📍</button>
+<button
+class="iconBtn"
+type="button"
+title="Moje poloha"
+onclick="useMyLocation('impact')">
+📍
+</button>
 
-<button class="iconBtn home" type="button" title="Sídlo firmy" onclick="useCompany('impact')">🏠</button>
+<button
+class="iconBtn home"
+type="button"
+title="Sídlo firmy"
+onclick="useCompany('impact')">
+🏠
+</button>
 
 </div>
 
-<div id="impactStatus" class="note">
+<div
+id="impactStatus"
+class="note">
 Po načtení zakázky se vyplní automaticky.
 </div>
 
 </div>
 
+<div
+class="addressBox"
+style="margin-top:9px">
 
-<div class="addressBox" style="margin-top:9px">
-
-<label>🔧 3. Servis klienta</label>
+<label>
+🔧 3. Servis klienta
+</label>
 
 <div class="addressRow">
 
 <div class="addressBox">
 
-<input id="toAddress" autocomplete="off" placeholder="Načte se ze zakázky">
+<input
+id="toAddress"
+autocomplete="off"
+placeholder="Načte se ze zakázky">
 
-<div id="toSuggestions" class="suggestions hidden"></div>
+<div
+id="toSuggestions"
+class="suggestions hidden">
+</div>
 
 </div>
 
-<button class="iconBtn" type="button" title="Moje poloha" onclick="useMyLocation('to')">📍</button>
+<button
+class="iconBtn"
+type="button"
+title="Moje poloha"
+onclick="useMyLocation('to')">
+📍
+</button>
 
-<button class="iconBtn home" type="button" title="Sídlo firmy" onclick="useCompany('to')">🏠</button>
+<button
+class="iconBtn home"
+type="button"
+title="Sídlo firmy"
+onclick="useCompany('to')">
+🏠
+</button>
 
 </div>
 
-<div id="toStatus" class="note">
+<div
+id="toStatus"
+class="note">
 Po načtení zakázky se vyplní automaticky.
 </div>
 
 </div>
 
+<div
+class="addressBox"
+style="margin-top:9px">
 
-<div class="addressBox" style="margin-top:9px">
-
-<label>🏁 4. Návrat / konec trasy</label>
+<label>
+🏁 4. Návrat / konec trasy
+</label>
 
 <div class="addressRow">
 
 <div class="addressBox">
 
-<input id="returnAddress" autocomplete="off" placeholder="Zadej adresu návratu">
+<input
+id="returnAddress"
+autocomplete="off"
+placeholder="Zadej adresu návratu">
 
-<div id="returnSuggestions" class="suggestions hidden"></div>
+<div
+id="returnSuggestions"
+class="suggestions hidden">
+</div>
 
 </div>
 
-<button class="iconBtn" type="button" title="Moje poloha" onclick="useMyLocation('return')">📍</button>
+<button
+class="iconBtn"
+type="button"
+title="Moje poloha"
+onclick="useMyLocation('return')">
+📍
+</button>
 
-<button class="iconBtn home" type="button" title="Sídlo firmy" onclick="useCompany('return')">🏠</button>
+<button
+class="iconBtn home"
+type="button"
+title="Sídlo firmy"
+onclick="useCompany('return')">
+🏠
+</button>
 
 </div>
 
-<div id="returnStatus" class="note">
+<div
+id="returnStatus"
+class="note">
 Např. 🏠 sídlo firmy nebo 📍 tvoje aktuální poloha.
 </div>
 
 </div>
 
+<div
+class="grid"
+style="margin-top:9px">
 
-<div class="grid" style="margin-top:9px">
-
-<button class="primary" onclick="calculateRoute()">
+<button
+class="primary"
+onclick="calculateRoute()">
 🗺️ Spočítat celou trasu
 </button>
 
-<button class="secondary" onclick="clearRoute()">
+<button
+class="secondary"
+onclick="clearRoute()">
 Vymazat trasu
 </button>
 
 </div>
 
-<div id="routeStatus" class="routeStatus">
+<div
+id="routeStatus"
+class="routeStatus">
 Zadej výjezd, zásah, servis a návrat.
 </div>
 
@@ -901,10 +1175,9 @@ Zadej výjezd, zásah, servis a návrat.
 
 </div>
 
-
-<!-- =========================
+<!-- =====================================================
      DATE
-     ========================= -->
+     ===================================================== -->
 
 <div class="card">
 
@@ -919,25 +1192,43 @@ Příplatky za víkend, noc a svátek se určují automaticky.
 <div class="grid">
 
 <div>
-<label>Datum zásahu</label>
-<input id="serviceDate" type="date" onchange="calculate()">
+
+<label>
+Datum zásahu
+</label>
+
+<input
+id="serviceDate"
+type="date"
+onchange="calculate()">
+
 </div>
 
 <div>
-<label>Čas zásahu</label>
-<input id="serviceTime" type="time" onchange="calculate()">
+
+<label>
+Čas zásahu
+</label>
+
+<input
+id="serviceTime"
+type="time"
+onchange="calculate()">
+
+</div>
+
+</div>
+
+<div
+id="autoSurcharges"
+style="margin-top:8px">
 </div>
 
 </div>
 
-<div id="autoSurcharges" style="margin-top:8px"></div>
-
-</div>
-
-
-<!-- =========================
+<!-- =====================================================
      EXTRAS
-     ========================= -->
+     ===================================================== -->
 
 <div class="card">
 
@@ -949,10 +1240,9 @@ Příplatky za víkend, noc a svátek se určují automaticky.
 
 </div>
 
-
-<!-- =========================
+<!-- =====================================================
      RESULT
-     ========================= -->
+     ===================================================== -->
 
 <div class="card">
 
@@ -993,38 +1283,48 @@ Příplatky za víkend, noc a svátek se určují automaticky.
 DOPLATEK KLIENTA – BEZ DPH
 </small>
 
-<div class="big" id="resultOut">0 Kč</div>
+<div
+class="big"
+id="resultOut">
+0 Kč
+</div>
 
 <small id="resultVatLabel">
 DOPLATEK KLIENTA – S DPH (21 %)
 </small>
 
-<div class="big vatAmount" id="resultVatOut">0 Kč</div>
-
+<div
+class="big vatAmount"
+id="resultVatOut">
+0 Kč
 </div>
 
 </div>
 
 </div>
 
+</div>
 
 <div class="card">
 
-<button class="primary" onclick="calculate()">
+<button
+class="primary"
+onclick="calculate()">
 Přepočítat
 </button>
 
-<p class="note" style="margin-bottom:0">
+<p
+class="note"
+style="margin-bottom:0">
 Ceny a limit jsou vedené bez DPH.
 Výsledná cena se zobrazuje také s DPH 21 %.
 </p>
 
 </div>
 
-
-<!-- =========================
+<!-- =====================================================
      SEND JOB
-     ========================= -->
+     ===================================================== -->
 
 <div class="card dispatchCard">
 
@@ -1039,31 +1339,46 @@ Po odeslání se zakázka uloží do TowBrüx a Driver ji dostane přes realtime
 <div class="grid">
 
 <div>
+
 <label>ID řidiče</label>
-<input id="dispatchDriver" value="driver1" placeholder="např. driver1">
+
+<input
+id="dispatchDriver"
+value="driver1"
+placeholder="např. driver1">
+
 </div>
 
 <div>
+
 <label>Číslo zakázky</label>
-<input id="dispatchJobNo" placeholder="automaticky z Čísla případu">
-</div>
+
+<input
+id="dispatchJobNo"
+placeholder="automaticky z Čísla případu">
 
 </div>
 
-<button class="primary dispatchSend" type="button" onclick="sendJobToDriver()">
+</div>
+
+<button
+class="primary dispatchSend"
+type="button"
+onclick="sendJobToDriver()">
 📨 ODESLAT DO DRIVERU
 </button>
 
-<div id="dispatchStatus" class="routeStatus">
+<div
+id="dispatchStatus"
+class="routeStatus">
 Připraveno k odeslání.
 </div>
 
 </div>
 
-
-<!-- =========================
+<!-- =====================================================
      DOCUMENTATION
-     ========================= -->
+     ===================================================== -->
 
 <div class="card docsCard">
 
@@ -1093,7 +1408,11 @@ placeholder="např. driver1">
 <label>Zakázka</label>
 
 <select id="docsJobSelect">
-<option value="">Nejdřív načti zakázky</option>
+
+<option value="">
+Nejdřív načti zakázky
+</option>
+
 </select>
 
 </div>
@@ -1102,11 +1421,17 @@ placeholder="např. driver1">
 
 <div class="docsToolbar">
 
-<button class="primary" type="button" onclick="loadDocumentationJobs()">
+<button
+class="primary"
+type="button"
+onclick="loadDocumentationJobs()">
 🔄 NAČÍST ZAKÁZKY
 </button>
 
-<button class="secondary" type="button" onclick="loadSelectedDocumentation()">
+<button
+class="secondary"
+type="button"
+onclick="loadSelectedDocumentation()">
 📂 ZOBRAZIT DOKUMENTACI
 </button>
 
@@ -1122,25 +1447,33 @@ onclick="deleteSelectedJob()">
 🗑️ SMAZAT ZAKÁZKU + DOKUMENTACI
 </button>
 
-<div id="docsJobInfo" class="docsJobInfo hidden"></div>
+<div
+id="docsJobInfo"
+class="docsJobInfo hidden">
+</div>
 
-<div id="docsStatus" class="routeStatus">
+<div
+id="docsStatus"
+class="routeStatus">
 Vyber zakázku a zobraz dokumentaci.
 </div>
 
-<div id="docsGrid" class="docsGrid"></div>
+<div
+id="docsGrid"
+class="docsGrid">
+</div>
 
 </div>
 
-
 </section>
 
-
-<!-- =========================
+<!-- =====================================================
      SETTINGS
-     ========================= -->
+     ===================================================== -->
 
-<section id="settings" class="hidden">
+<section
+id="settings"
+class="hidden">
 
 <div class="card">
 
@@ -1152,18 +1485,28 @@ Geoapify API
 Klíč se ukládá pouze do tohoto zařízení.
 </p>
 
-<label>Geoapify API klíč</label>
+<label>
+Geoapify API klíč
+</label>
 
-<input id="geoKey" type="password" placeholder="Vlož API klíč">
+<input
+id="geoKey"
+type="password"
+placeholder="Vlož API klíč">
 
-<button class="primary" style="margin-top:8px" onclick="saveGeoKey()">
+<button
+class="primary"
+style="margin-top:8px"
+onclick="saveGeoKey()">
 Uložit API klíč
 </button>
 
-<p id="keyStatus" class="note"></p>
+<p
+id="keyStatus"
+class="note">
+</p>
 
 </div>
-
 
 <div class="card">
 
@@ -1175,26 +1518,44 @@ TowBrüx Dispatch / Supabase
 Použij stejný Supabase Publishable key jako v TowBrüx Driver.
 </p>
 
-<label>Supabase Publishable key</label>
+<label>
+Supabase Publishable key
+</label>
 
-<input id="supabaseKey" type="password" placeholder="Vlož Publishable key">
+<input
+id="supabaseKey"
+type="password"
+placeholder="Vlož Publishable key">
 
-<label>ID výchozího řidiče</label>
+<label>
+ID výchozího řidiče
+</label>
 
-<input id="defaultDriver" value="driver1" placeholder="např. driver1">
+<input
+id="defaultDriver"
+value="driver1"
+placeholder="např. driver1">
 
-<button class="primary" style="margin-top:8px" onclick="saveDispatchConfig()">
+<button
+class="primary"
+style="margin-top:8px"
+onclick="saveDispatchConfig()">
 Uložit a ověřit připojení
 </button>
 
-<button class="secondary" style="margin-top:7px;width:100%" onclick="initDispatchSupabase()">
+<button
+class="secondary"
+style="margin-top:7px;width:100%"
+onclick="initDispatchSupabase()">
 🔎 OTESTOVAT SUPABASE
 </button>
 
-<p id="dispatchConnectionStatus" class="note"></p>
+<p
+id="dispatchConnectionStatus"
+class="note">
+</p>
 
 </div>
-
 
 <div class="card">
 
@@ -1204,11 +1565,16 @@ Ceník
 
 <div id="priceTables"></div>
 
-<button class="primary" onclick="saveSettings()">
+<button
+class="primary"
+onclick="saveSettings()">
 Uložit ceník
 </button>
 
-<button class="secondary" style="margin-top:7px;width:100%" onclick="resetSettings()">
+<button
+class="secondary"
+style="margin-top:7px;width:100%"
+onclick="resetSettings()">
 Obnovit výchozí ceny
 </button>
 
@@ -1217,8 +1583,8 @@ Obnovit výchozí ceny
 </section>
 
 </main>
-</div>
 
+</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1294,7 +1660,9 @@ transportPersonsKm:15
 };
 
 let data=
-JSON.parse(localStorage.getItem("odtahCenik2026")||"null")
+JSON.parse(
+localStorage.getItem("odtahCenik2026")||"null"
+)
 ||
 structuredClone(defaultData);
 
@@ -1331,9 +1699,8 @@ return:null
 
 let timers={};
 
-
 /* =========================================================
-   ROZPRACOVANÁ OCR ZAKÁZKA
+   OCR DRAFT
    ========================================================= */
 
 let ocrDraft={
@@ -1346,7 +1713,6 @@ screenshots:0
 };
 
 let manualLimitOverride=false;
-
 
 function resetOcrDraft(){
 
@@ -1365,7 +1731,6 @@ renderOcrDraft();
 
 }
 
-
 function hasOcrDraftData(){
 
 return !!(
@@ -1376,7 +1741,6 @@ ocrDraft.limitMode
 );
 
 }
-
 
 function mergeOcrData(d){
 
@@ -1397,7 +1761,10 @@ d.limitMode &&
 
 ocrDraft.limitMode=d.limitMode;
 
-if(d.limit!==null&&d.limit!==undefined)
+if(
+d.limit!==null &&
+d.limit!==undefined
+)
 ocrDraft.limit=d.limit;
 
 }
@@ -1409,7 +1776,6 @@ applyOcrDraft();
 renderOcrDraft();
 
 }
-
 
 function applyOcrDraft(){
 
@@ -1476,13 +1842,18 @@ document.getElementById(
 calculate();
 
 if(ocrDraft.client)
-geocodeExact("impact",ocrDraft.client);
+geocodeExact(
+"impact",
+ocrDraft.client
+);
 
 if(ocrDraft.target)
-geocodeExact("to",ocrDraft.target);
+geocodeExact(
+"to",
+ocrDraft.target
+);
 
 }
-
 
 function renderOcrDraft(){
 
@@ -1496,6 +1867,7 @@ if(!hasOcrDraftData()){
 
 box.classList.add("hidden");
 box.innerHTML="";
+
 return;
 
 }
@@ -1509,7 +1881,9 @@ if(ocrDraft.limitMode==="amount"){
 limitHtml=
 `<b>${money0(ocrDraft.limit)}</b>`;
 
-}else if(ocrDraft.limitMode==="real"){
+}else if(
+ocrDraft.limitMode==="real"
+){
 
 limitHtml=
 `<b class="realCosts">REÁLNÉ NÁKLADY</b>`;
@@ -1581,15 +1955,50 @@ onclick="startNewOcrJob()">
 
 }
 
-
 function startNewOcrJob(){
 
-if(
-!confirm(
-"Začít načítat úplně novou zakázku? Dosavadní OCR údaje budou vymazány."
-)
-)
+const overlay=
+document.getElementById("confirmOverlay");
+
+const text=
+document.getElementById("confirmText");
+
+const cancel=
+document.getElementById("confirmCancel");
+
+const confirmBtn=
+document.getElementById("confirmDelete");
+
+if(!overlay||!text||!cancel||!confirmBtn)
 return;
+
+text.innerHTML=
+`Začít načítat úplně novou zakázku?<br><br>
+Dosavadní OCR údaje budou vymazány.`;
+
+overlay.classList.remove("hidden");
+
+const oldCancel=
+cancel.onclick;
+
+const oldConfirm=
+confirmBtn.onclick;
+
+cancel.onclick=()=>{
+
+overlay.classList.add("hidden");
+
+cancel.onclick=oldCancel;
+confirmBtn.onclick=oldConfirm;
+
+};
+
+confirmBtn.onclick=()=>{
+
+overlay.classList.add("hidden");
+
+cancel.onclick=oldCancel;
+confirmBtn.onclick=oldConfirm;
 
 resetOcrDraft();
 
@@ -1603,12 +2012,16 @@ document.getElementById("toAddress").value="";
 
 document.getElementById("limit").value=1652;
 
-document.getElementById("realCostsNote").classList.add("hidden");
+document.getElementById(
+"realCostsNote"
+).classList.add("hidden");
 
 places.impact=null;
 places.to=null;
 
-document.getElementById("ocrPreview").classList.add("hidden");
+document.getElementById(
+"ocrPreview"
+).classList.add("hidden");
 
 setOCRStatus(
 "Čeká na screenshot nové zakázky."
@@ -1616,8 +2029,9 @@ setOCRStatus(
 
 calculate();
 
-}
+};
 
+}
 
 /* =========================================================
    SUPABASE
@@ -1628,7 +2042,9 @@ function dispatchCfg(){
 try{
 
 return JSON.parse(
-localStorage.getItem("tb_dispatch_config")||"{}"
+localStorage.getItem(
+"tb_dispatch_config"
+)||"{}"
 );
 
 }catch(e){
@@ -1639,36 +2055,47 @@ return {};
 
 }
 
+function dispatchStatus(
+msg,
+cls=""
+){
 
-function dispatchStatus(msg,cls=""){
-
-const e=document.getElementById("dispatchStatus");
+const e=
+document.getElementById(
+"dispatchStatus"
+);
 
 if(e){
 
 e.textContent=msg;
-e.className="routeStatus "+cls;
+
+e.className=
+"routeStatus "+cls;
 
 }
 
 }
 
+function dispatchConnectionStatus(
+msg,
+ok=false
+){
 
-function dispatchConnectionStatus(msg,ok=false){
-
-const e=document.getElementById(
+const e=
+document.getElementById(
 "dispatchConnectionStatus"
 );
 
 if(e){
 
 e.textContent=msg;
-e.className="note "+(ok?"ok":"warn");
+
+e.className=
+"note "+(ok?"ok":"warn");
 
 }
 
 }
-
 
 function normalizeSupabaseKey(v){
 
@@ -1679,10 +2106,10 @@ return String(v||"")
 
 }
 
-
 function supabaseKeyHint(key){
 
-if(!key)return "klíč chybí";
+if(!key)
+return "klíč chybí";
 
 if(key.startsWith("sb_publishable_"))
 return "Publishable key ✓";
@@ -1697,21 +2124,27 @@ return "neznámý formát klíče";
 
 }
 
-
 async function saveDispatchConfig(){
 
 const key=
 normalizeSupabaseKey(
-document.getElementById("supabaseKey").value
+document.getElementById(
+"supabaseKey"
+).value
 );
 
 const driver=
-document.getElementById("defaultDriver").value.trim()
+document.getElementById(
+"defaultDriver"
+).value.trim()
 ||"driver1";
 
 if(!key){
 
-alert("Vlož Supabase Publishable key.");
+alert(
+"Vlož Supabase Publishable key."
+);
+
 return;
 
 }
@@ -1735,23 +2168,34 @@ driver
 })
 );
 
-document.getElementById("supabaseKey").value=key;
-document.getElementById("dispatchDriver").value=driver;
-document.getElementById("docsDriver").value=driver;
+document.getElementById(
+"supabaseKey"
+).value=key;
 
-const ok=await initDispatchSupabase();
+document.getElementById(
+"dispatchDriver"
+).value=driver;
+
+document.getElementById(
+"docsDriver"
+).value=driver;
+
+const ok=
+await initDispatchSupabase();
 
 if(ok)
-alert("TowBrüx Dispatch připojen ✓");
+alert(
+"TowBrüx Dispatch připojen ✓"
+);
 
 }
-
 
 async function initDispatchSupabase(){
 
 const c=dispatchCfg();
 
-const key=normalizeSupabaseKey(c.key);
+const key=
+normalizeSupabaseKey(c.key);
 
 if(!key){
 
@@ -1809,11 +2253,17 @@ await tbDispatch
 
 if(test.error){
 
-console.error("Supabase test:",test.error);
+console.error(
+"Supabase test:",
+test.error
+);
 
 tbDispatch=null;
 
-const msg=String(test.error.message||"");
+const msg=
+String(
+test.error.message||""
+);
 
 if(
 /invalid api key/i.test(msg)||
@@ -1824,7 +2274,9 @@ dispatchConnectionStatus(
 "❌ Neplatný Supabase API key. Zkontroluj Publishable key."
 );
 
-}else if(test.error.status===403){
+}else if(
+test.error.status===403
+){
 
 dispatchConnectionStatus(
 "⚠️ Klíč je přijatý, ale Supabase blokuje přístup k tabulce zakazky."
@@ -1843,7 +2295,8 @@ return false;
 }
 
 dispatchConnectionStatus(
-"Supabase: připojeno ✓ • "+supabaseKeyHint(key),
+"Supabase: připojeno ✓ • "+
+supabaseKeyHint(key),
 true
 );
 
@@ -1856,7 +2309,8 @@ console.error(e);
 tbDispatch=null;
 
 dispatchConnectionStatus(
-"❌ Chyba připojení: "+(e.message||"neznámá chyba")
+"❌ Chyba připojení: "+
+(e.message||"neznámá chyba")
 );
 
 return false;
@@ -1864,7 +2318,6 @@ return false;
 }
 
 }
-
 
 async function ensureDispatchSupabase(){
 
@@ -1874,7 +2327,6 @@ return true;
 return await initDispatchSupabase();
 
 }
-
 
 /* =========================================================
    MONEY
@@ -1895,7 +2347,8 @@ new Intl.NumberFormat(
 {maximumFractionDigits:2}
 ).format(Number(n)||0)+" Kč";
 
-const pad2=n=>String(n).padStart(2,"0");
+const pad2=n=>
+String(n).padStart(2,"0");
 
 function makeJobNumber(){
 
@@ -1904,7 +2357,6 @@ const d=new Date();
 return `TB-${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}-${pad2(d.getHours())}${pad2(d.getMinutes())}${pad2(d.getSeconds())}`;
 
 }
-
 
 /* =========================================================
    MANUAL LIMIT
@@ -1915,8 +2367,11 @@ function setManualLimit(){
 manualLimitOverride=true;
 
 ocrDraft.limitMode="manual";
+
 ocrDraft.limit=
-Number(document.getElementById("limit").value)||0;
+Number(
+document.getElementById("limit").value
+)||0;
 
 document.getElementById(
 "realCostsNote"
@@ -1926,7 +2381,6 @@ renderOcrDraft();
 
 }
 
-
 /* =========================================================
    SEND JOB
    ========================================================= */
@@ -1935,7 +2389,9 @@ async function sendJobToDriver(){
 
 const driver=
 (
-document.getElementById("dispatchDriver").value.trim()
+document.getElementById(
+"dispatchDriver"
+).value.trim()
 ||
 dispatchCfg().driver
 ||
@@ -1943,19 +2399,29 @@ dispatchCfg().driver
 );
 
 const impact=
-document.getElementById("impactAddress").value.trim();
+document.getElementById(
+"impactAddress"
+).value.trim();
 
 const service=
-document.getElementById("toAddress").value.trim();
+document.getElementById(
+"toAddress"
+).value.trim();
 
 const returnAddressValue=
-document.getElementById("returnAddress").value.trim();
+document.getElementById(
+"returnAddress"
+).value.trim();
 
 const from=
-document.getElementById("fromAddress").value.trim();
+document.getElementById(
+"fromAddress"
+).value.trim();
 
 const jobNo=
-document.getElementById("dispatchJobNo").value.trim()
+document.getElementById(
+"dispatchJobNo"
+).value.trim()
 ||
 ocrDraft.caseNo
 ||
@@ -1996,7 +2462,8 @@ return;
 
 }
 
-const btn=document.querySelector(".dispatchSend");
+const btn=
+document.querySelector(".dispatchSend");
 
 if(btn)
 btn.disabled=true;
@@ -2010,16 +2477,24 @@ try{
 const active=
 await tbDispatch
 .from("zakazky")
-.select("id,stav,cislo_zakazky")
+.select(
+"id,stav,cislo_zakazky"
+)
 .eq("ridic_id",driver)
 .neq("stav","dokoncena")
 .limit(1);
 
 if(active.error){
 
-const msg=String(active.error.message||"");
+const msg=
+String(
+active.error.message||""
+);
 
-if(/invalid api key/i.test(msg)||active.error.status===401){
+if(
+/invalid api key/i.test(msg)||
+active.error.status===401
+){
 
 tbDispatch=null;
 
@@ -2042,14 +2517,25 @@ throw active.error;
 }
 
 if(
-active.data?.length &&
-!confirm(
-`Řidič ${driver} má aktivní zakázku ${active.data[0].cislo_zakazky||active.data[0].id}. Přesto odeslat další zakázku?`
-)
+active.data?.length
 ){
 
-dispatchStatus("Odeslání zrušeno.");
+const continueSend=
+await showActiveJobConfirm(
+driver,
+active.data[0].cislo_zakazky||
+active.data[0].id
+);
+
+if(!continueSend){
+
+dispatchStatus(
+"Odeslání zrušeno."
+);
+
 return;
+
+}
 
 }
 
@@ -2061,7 +2547,9 @@ manualLimitOverride
 ocrDraft.limitMode||"amount";
 
 const limitValue=
-Number(document.getElementById("limit").value)||0;
+Number(
+document.getElementById("limit").value
+)||0;
 
 const limitText=
 limitMode==="real"
@@ -2096,13 +2584,25 @@ from?
 returnAddressValue?
 `Návrat: ${returnAddressValue}`:"",
 
-document.getElementById("serviceDate").value
+document.getElementById(
+"serviceDate"
+).value
 ?
-`Datum: ${document.getElementById("serviceDate").value}`:"",
+`Datum: ${
+document.getElementById(
+"serviceDate"
+).value
+}`:"",
 
-document.getElementById("serviceTime").value
+document.getElementById(
+"serviceTime"
+).value
 ?
-`Čas: ${document.getElementById("serviceTime").value}`:""
+`Čas: ${
+document.getElementById(
+"serviceTime"
+).value
+}`:""
 
 ]
 .filter(Boolean)
@@ -2127,13 +2627,19 @@ await tbDispatch
 if(error)
 throw error;
 
-document.getElementById("dispatchJobNo").value=
+document.getElementById(
+"dispatchJobNo"
+).value=
 insertedData?.cislo_zakazky||jobNo;
 
-document.getElementById("docsDriver").value=driver;
+document.getElementById(
+"docsDriver"
+).value=driver;
 
 dispatchStatus(
-`✅ Zakázka ${insertedData?.cislo_zakazky||jobNo} odeslána řidiči ${driver}.`,
+`✅ Zakázka ${
+insertedData?.cislo_zakazky||jobNo
+} odeslána řidiči ${driver}.`,
 "ok"
 );
 
@@ -2142,7 +2648,8 @@ dispatchStatus(
 console.error(e);
 
 dispatchStatus(
-"❌ Zakázku se nepodařilo odeslat: "+(e.message||"chyba"),
+"❌ Zakázku se nepodařilo odeslat: "+
+(e.message||"chyba"),
 "error"
 );
 
@@ -2155,6 +2662,105 @@ btn.disabled=false;
 
 }
 
+/* =========================================================
+   AKTIVNÍ ZAKÁZKA - POTVRZENÍ
+   ========================================================= */
+
+function showActiveJobConfirm(
+driver,
+job
+){
+
+return new Promise(resolve=>{
+
+const overlay=
+document.getElementById(
+"confirmOverlay"
+);
+
+const text=
+document.getElementById(
+"confirmText"
+);
+
+const cancel=
+document.getElementById(
+"confirmCancel"
+);
+
+const confirmBtn=
+document.getElementById(
+"confirmDelete"
+);
+
+if(
+!overlay||
+!text||
+!cancel||
+!confirmBtn
+){
+
+resolve(false);
+return;
+
+}
+
+text.innerHTML=
+`Řidič <b>${escapeHtml(driver)}</b> má aktivní zakázku
+<b>${escapeHtml(job)}</b>.<br><br>
+Přesto odeslat další zakázku?`;
+
+confirmBtn.textContent=
+"📨 ANO, ODESLAT";
+
+overlay.classList.remove("hidden");
+
+const cleanup=()=>{
+
+overlay.classList.add("hidden");
+
+cancel.removeEventListener(
+"click",
+onCancel
+);
+
+confirmBtn.removeEventListener(
+"click",
+onConfirm
+);
+
+confirmBtn.textContent=
+"🗑️ ANO, SMAZAT";
+
+};
+
+const onCancel=()=>{
+
+cleanup();
+resolve(false);
+
+};
+
+const onConfirm=()=>{
+
+cleanup();
+resolve(true);
+
+};
+
+cancel.addEventListener(
+"click",
+onCancel
+);
+
+confirmBtn.addEventListener(
+"click",
+onConfirm
+);
+
+});
+
+}
 
 /* =========================================================
    PRICING
@@ -2173,13 +2779,16 @@ return data.categories[
 
 function populate(){
 
-const s=document.getElementById("category");
+const s=
+document.getElementById("category");
 
 s.innerHTML="";
 
-data.categories.forEach((c,i)=>{
+data.categories.forEach(
+(c,i)=>{
 
-const o=document.createElement("option");
+const o=
+document.createElement("option");
 
 o.value=i;
 o.textContent=c.name;
@@ -2199,7 +2808,9 @@ renderOcrDraft();
 
 function renderCategoryNote(){
 
-document.getElementById("catNote").innerHTML=
+document.getElementById(
+"catNote"
+).innerHTML=
 `<span class="pill">${money(current().km)} / km</span>`;
 
 }
@@ -2211,16 +2822,38 @@ const g=data.general;
 
 const list=[
 
-["manip","Naložení / složení vozidla",c.extras.manip],
-["recovery","Vyproštění vozidla",c.extras.recovery],
-["waiting","Čekací doba – 30 min",c.extras.waiting],
-["difficult","Ztížená manipulace",g.difficult]
+[
+"manip",
+"Naložení / složení vozidla",
+c.extras.manip
+],
+
+[
+"recovery",
+"Vyproštění vozidla",
+c.extras.recovery
+],
+
+[
+"waiting",
+"Čekací doba – 30 min",
+c.extras.waiting
+],
+
+[
+"difficult",
+"Ztížená manipulace",
+g.difficult
+]
 
 ];
 
-document.getElementById("extras").innerHTML=
+document.getElementById(
+"extras"
+).innerHTML=
 
-list.map(x=>
+list.map(
+x=>
 `<div class="check">
 
 <input
@@ -2237,32 +2870,73 @@ ${x[1]} (${money(x[2])})
 
 +
 
-`<div class="grid" style="grid-column:1/-1;margin-top:2px">
+`<div
+class="grid"
+style="grid-column:1/-1;margin-top:2px">
 
 <div>
-<label>Druhé vozidlo – km</label>
-<input id="secondKm" type="number" min="0" value="0" oninput="calculate()">
+
+<label>
+Druhé vozidlo – km
+</label>
+
+<input
+id="secondKm"
+type="number"
+min="0"
+value="0"
+oninput="calculate()">
+
 </div>
 
 <div>
-<label>Přeprava osob – km</label>
-<input id="personsKm" type="number" min="0" value="0" oninput="calculate()">
+
+<label>
+Přeprava osob – km
+</label>
+
+<input
+id="personsKm"
+type="number"
+min="0"
+value="0"
+oninput="calculate()">
+
 </div>
 
 <div>
-<label>Uskladnění do 3,5 t – dny</label>
-<input id="storageU" type="number" min="0" value="0" oninput="calculate()">
+
+<label>
+Uskladnění do 3,5 t – dny
+</label>
+
+<input
+id="storageU"
+type="number"
+min="0"
+value="0"
+oninput="calculate()">
+
 </div>
 
 <div>
-<label>Uskladnění nad 3,5 t – dny</label>
-<input id="storageO" type="number" min="0" value="0" oninput="calculate()">
+
+<label>
+Uskladnění nad 3,5 t – dny
+</label>
+
+<input
+id="storageO"
+type="number"
+min="0"
+value="0"
+oninput="calculate()">
+
 </div>
 
 </div>`;
 
 }
-
 
 const CZ_HOLIDAYS_FIXED={
 
@@ -2294,10 +2968,17 @@ const i=Math.floor(c/4);
 const k=c%4;
 const l=(32+2*e+2*i-h-k)%7;
 const m=Math.floor((a+11*h+22*l)/451);
-const mo=Math.floor((h+l-7*m+114)/31);
-const da=((h+l-7*m+114)%31)+1;
+const mo=Math.floor(
+(h+l-7*m+114)/31
+);
+const da=
+((h+l-7*m+114)%31)+1;
 
-return new Date(y,mo-1,da);
+return new Date(
+y,
+mo-1,
+da
+);
 
 }
 
@@ -2309,18 +2990,32 @@ const f=
 if(CZ_HOLIDAYS_FIXED[f])
 return CZ_HOLIDAYS_FIXED[f];
 
-const e=easterSunday(d.getFullYear());
+const e=
+easterSunday(
+d.getFullYear()
+);
 
 const g=new Date(e);
 const m=new Date(e);
 
-g.setDate(e.getDate()-2);
-m.setDate(e.getDate()+1);
+g.setDate(
+e.getDate()-2
+);
 
-if(localDateKey(d)===localDateKey(g))
+m.setDate(
+e.getDate()+1
+);
+
+if(
+localDateKey(d)===
+localDateKey(g)
+)
 return "Velký pátek";
 
-if(localDateKey(d)===localDateKey(m))
+if(
+localDateKey(d)===
+localDateKey(m)
+)
 return "Velikonoční pondělí";
 
 return "";
@@ -2328,23 +3023,44 @@ return "";
 }
 
 const serviceDateEl=
-document.getElementById("serviceDate");
+document.getElementById(
+"serviceDate"
+);
 
 const serviceTimeEl=
-document.getElementById("serviceTime");
+document.getElementById(
+"serviceTime"
+);
 
 function serviceDate(){
 
-const ds=serviceDateEl.value;
-const ts=serviceTimeEl.value;
+const ds=
+serviceDateEl.value;
+
+const ts=
+serviceTimeEl.value;
 
 if(!ds||!ts)
 return new Date();
 
-const [y,m,d]=ds.split("-").map(Number);
-const [h,mi]=ts.split(":").map(Number);
+const [
+y,
+m,
+d
+]=ds.split("-").map(Number);
 
-return new Date(y,m-1,d,h,mi);
+const [
+h,
+mi
+]=ts.split(":").map(Number);
+
+return new Date(
+y,
+m-1,
+d,
+h,
+mi
+);
 
 }
 
@@ -2353,7 +3069,8 @@ function initDate(){
 const n=new Date();
 
 if(!serviceDateEl.value)
-serviceDateEl.value=localDateKey(n);
+serviceDateEl.value=
+localDateKey(n);
 
 if(!serviceTimeEl.value)
 serviceTimeEl.value=
@@ -2374,124 +3091,267 @@ const n=
 d.getHours()*60+
 d.getMinutes();
 
-const night=n>=1260||n<360;
-const h=!!getHoliday(d);
+const night=
+n>=1260||n<360;
 
-document.getElementById("autoSurcharges").innerHTML=
+const h=
+!!getHoliday(d);
+
+document.getElementById(
+"autoSurcharges"
+).innerHTML=
 
 `<div class="check">
-<input type="checkbox" disabled ${w?"checked":""}>
-<label>${w?"🟢":"⚪"} Víkend +${w?money(g.weekend):"0 Kč"}</label>
+
+<input
+type="checkbox"
+disabled
+${w?"checked":""}>
+
+<label>
+${w?"🟢":"⚪"}
+Víkend +${w?money(g.weekend):"0 Kč"}
+</label>
+
 </div>`
 
 +
 
 `<div class="check">
-<input type="checkbox" disabled ${night?"checked":""}>
-<label>${night?"🟢":"⚪"} Noc 21:00–06:00 +${night?money(g.night):"0 Kč"}</label>
+
+<input
+type="checkbox"
+disabled
+${night?"checked":""}>
+
+<label>
+${night?"🟢":"⚪"}
+Noc 21:00–06:00 +${night?money(g.night):"0 Kč"}
+</label>
+
 </div>`
 
 +
 
 `<div class="check">
-<input type="checkbox" disabled ${h?"checked":""}>
-<label>${h?"🟢":"⚪"} Svátek +${h?money(g.holiday):"0 Kč"}</label>
+
+<input
+type="checkbox"
+disabled
+${h?"checked":""}>
+
+<label>
+${h?"🟢":"⚪"}
+Svátek +${h?money(g.holiday):"0 Kč"}
+</label>
+
 </div>`;
 
-return{w,night,h};
+return{
+w,
+night,
+h
+};
 
 }
-
 
 function calculate(){
 
 const c=current();
 
 const km=
-+document.getElementById("km").value||0;
++document.getElementById(
+"km"
+).value||0;
 
 const limit=
-+document.getElementById("limit").value||0;
++document.getElementById(
+"limit"
+).value||0;
 
 const g=data.general;
+
 const a=renderAuto();
 
 let ex=0;
 
 [
-["manip",c.extras.manip],
-["recovery",c.extras.recovery],
-["waiting",c.extras.waiting],
-["difficult",g.difficult]
-].forEach(([k,v])=>{
+[
+"manip",
+c.extras.manip
+],
 
-const e=document.getElementById("x_"+k);
+[
+"recovery",
+c.extras.recovery
+],
+
+[
+"waiting",
+c.extras.waiting
+],
+
+[
+"difficult",
+g.difficult
+]
+
+].forEach(
+([k,v])=>{
+
+const e=
+document.getElementById(
+"x_"+k
+);
 
 if(e?.checked)
 ex+=v;
 
 });
 
-if(a.w)ex+=g.weekend;
-if(a.night)ex+=g.night;
-if(a.h)ex+=g.holiday;
+if(a.w)
+ex+=g.weekend;
 
-ex+=(+document.getElementById("secondKm").value||0)*g.secondVehicleKm;
-ex+=(+document.getElementById("personsKm").value||0)*g.transportPersonsKm;
-ex+=(+document.getElementById("storageU").value||0)*g.storageUnder35;
-ex+=(+document.getElementById("storageO").value||0)*g.storageOver35;
+if(a.night)
+ex+=g.night;
 
-const base=km*c.km;
-const total=base+ex;
+if(a.h)
+ex+=g.holiday;
+
+ex+=
+(
++document.getElementById(
+"secondKm"
+)?.value||0
+)*
+g.secondVehicleKm;
+
+ex+=
+(
++document.getElementById(
+"personsKm"
+)?.value||0
+)*
+g.transportPersonsKm;
+
+ex+=
+(
++document.getElementById(
+"storageU"
+)?.value||0
+)*
+g.storageUnder35;
+
+ex+=
+(
++document.getElementById(
+"storageO"
+)?.value||0
+)*
+g.storageOver35;
+
+const base=
+km*c.km;
+
+const total=
+base+ex;
+
 const vatRate=.21;
-const totalVat=total*(1+vatRate);
 
-document.getElementById("baseOut").textContent=money(base);
-document.getElementById("extrasOut").textContent=money(ex);
-document.getElementById("totalOut").textContent=money(total);
-document.getElementById("totalVatOut").textContent=money(totalVat);
+const totalVat=
+total*(1+vatRate);
+
+document.getElementById(
+"baseOut"
+).textContent=
+money(base);
+
+document.getElementById(
+"extrasOut"
+).textContent=
+money(ex);
+
+document.getElementById(
+"totalOut"
+).textContent=
+money(total);
+
+document.getElementById(
+"totalVatOut"
+).textContent=
+money(totalVat);
 
 const realCosts=
 !manualLimitOverride &&
 ocrDraft.limitMode==="real";
 
-const limitOut=document.getElementById("limitOut");
-const resultOut=document.getElementById("resultOut");
-const resultVatOut=document.getElementById("resultVatOut");
+const limitOut=
+document.getElementById(
+"limitOut"
+);
+
+const resultOut=
+document.getElementById(
+"resultOut"
+);
+
+const resultVatOut=
+document.getElementById(
+"resultVatOut"
+);
 
 if(realCosts){
 
-limitOut.textContent="Reálné náklady";
-limitOut.className="realCosts";
+limitOut.textContent=
+"Reálné náklady";
+
+limitOut.className=
+"realCosts";
 
 resultOut.textContent="—";
 resultVatOut.textContent="—";
 
-document.getElementById("resultLabel").textContent=
+document.getElementById(
+"resultLabel"
+).textContent=
 "LIMIT KLIENTA";
 
-document.getElementById("resultVatLabel").textContent=
+document.getElementById(
+"resultVatLabel"
+).textContent=
 "VÝPOČET DOPLATKU NENÍ POUŽIT";
 
 }else{
 
-limitOut.textContent=money(limit);
+limitOut.textContent=
+money(limit);
+
 limitOut.className="";
 
-const d=total-limit;
-const dVat=d*(1+vatRate);
+const d=
+total-limit;
 
-resultOut.textContent=money(Math.abs(d));
-resultVatOut.textContent=money(Math.abs(dVat));
+const dVat=
+d*(1+vatRate);
 
-document.getElementById("resultLabel").textContent=
+resultOut.textContent=
+money(Math.abs(d));
+
+resultVatOut.textContent=
+money(Math.abs(dVat));
+
+document.getElementById(
+"resultLabel"
+).textContent=
 d>=0
 ?
 "DOPLATEK KLIENTA – BEZ DPH"
 :
 "PŘEPLATEK KLIENTA – BEZ DPH";
 
-document.getElementById("resultVatLabel").textContent=
+document.getElementById(
+"resultVatLabel"
+).textContent=
 d>=0
 ?
 "DOPLATEK KLIENTA – S DPH (21 %)"
@@ -2502,7 +3362,6 @@ d>=0
 
 }
 
-
 /* =========================================================
    SETTINGS
    ========================================================= */
@@ -2511,7 +3370,8 @@ function renderSettings(){
 
 let h="";
 
-data.categories.forEach((c,i)=>
+data.categories.forEach(
+(c,i)=>
 
 h+=
 `<div class="card priceCard">
@@ -2521,23 +3381,59 @@ h+=
 <div class="grid">
 
 <div>
-<label>Cena/km</label>
-<input data-path="c.${i}.km" value="${c.km}" type="number" step=".01">
+
+<label>
+Cena/km
+</label>
+
+<input
+data-path="c.${i}.km"
+value="${c.km}"
+type="number"
+step=".01">
+
 </div>
 
 <div>
-<label>Naložení</label>
-<input data-path="c.${i}.extras.manip" value="${c.extras.manip}" type="number" step=".01">
+
+<label>
+Naložení
+</label>
+
+<input
+data-path="c.${i}.extras.manip"
+value="${c.extras.manip}"
+type="number"
+step=".01">
+
 </div>
 
 <div>
-<label>Vyproštění</label>
-<input data-path="c.${i}.extras.recovery" value="${c.extras.recovery}" type="number" step=".01">
+
+<label>
+Vyproštění
+</label>
+
+<input
+data-path="c.${i}.extras.recovery"
+value="${c.extras.recovery}"
+type="number"
+step=".01">
+
 </div>
 
 <div>
-<label>Čekání</label>
-<input data-path="c.${i}.extras.waiting" value="${c.extras.waiting}" type="number" step=".01">
+
+<label>
+Čekání
+</label>
+
+<input
+data-path="c.${i}.extras.waiting"
+value="${c.extras.waiting}"
+type="number"
+step=".01">
+
 </div>
 
 </div>
@@ -2552,20 +3448,61 @@ h+=
 
 <div class="grid">
 
-${setting("Víkend","general.weekend",data.general.weekend)}
-${setting("Noc","general.night",data.general.night)}
-${setting("Svátek","general.holiday",data.general.holiday)}
-${setting("Ztížená manipulace","general.difficult",data.general.difficult)}
-${setting("Druhé vozidlo Kč/km","general.secondVehicleKm",data.general.secondVehicleKm)}
-${setting("Uskladnění do 3,5 t Kč/den","general.storageUnder35",data.general.storageUnder35)}
-${setting("Uskladnění nad 3,5 t Kč/den","general.storageOver35",data.general.storageOver35)}
-${setting("Přeprava osob Kč/km","general.transportPersonsKm",data.general.transportPersonsKm)}
+${setting(
+"Víkend",
+"general.weekend",
+data.general.weekend
+)}
+
+${setting(
+"Noc",
+"general.night",
+data.general.night
+)}
+
+${setting(
+"Svátek",
+"general.holiday",
+data.general.holiday
+)}
+
+${setting(
+"Ztížená manipulace",
+"general.difficult",
+data.general.difficult
+)}
+
+${setting(
+"Druhé vozidlo Kč/km",
+"general.secondVehicleKm",
+data.general.secondVehicleKm
+)}
+
+${setting(
+"Uskladnění do 3,5 t Kč/den",
+"general.storageUnder35",
+data.general.storageUnder35
+)}
+
+${setting(
+"Uskladnění nad 3,5 t Kč/den",
+"general.storageOver35",
+data.general.storageOver35
+)}
+
+${setting(
+"Přeprava osob Kč/km",
+"general.transportPersonsKm",
+data.general.transportPersonsKm
+)}
 
 </div>
 
 </div>`;
 
-document.getElementById("priceTables").innerHTML=h;
+document.getElementById(
+"priceTables"
+).innerHTML=h;
 
 }
 
@@ -2592,7 +3529,10 @@ const a=p.split(".");
 
 if(a[0]==="c"){
 
-const c=data.categories[+a[1]];
+const c=
+data.categories[
++a[1]
+];
 
 if(a[2]==="km")
 c.km=v;
@@ -2610,9 +3550,15 @@ data.general[a[1]]=v;
 function saveSettings(){
 
 document
-.querySelectorAll("#settings input[data-path]")
-.forEach(e=>
-setPath(e.dataset.path,+e.value||0)
+.querySelectorAll(
+"#settings input[data-path]"
+)
+.forEach(
+e=>
+setPath(
+e.dataset.path,
++e.value||0
+)
 );
 
 localStorage.setItem(
@@ -2624,15 +3570,22 @@ populate();
 
 showTab("calc");
 
-alert("Ceník uložen.");
+alert(
+"Ceník uložen."
+);
 
 }
 
 function resetSettings(){
 
-if(confirm("Obnovit výchozí ceny?")){
+if(
+confirm(
+"Obnovit výchozí ceny?"
+)
+){
 
-data=structuredClone(defaultData);
+data=
+structuredClone(defaultData);
 
 localStorage.setItem(
 "odtahCenik2026",
@@ -2645,40 +3598,64 @@ populate();
 
 }
 
-
 /* =========================================================
    TABS
    ========================================================= */
 
 function showTab(t){
 
-document.getElementById("calc")
-.classList.toggle("hidden",t!=="calc");
+document.getElementById(
+"calc"
+)
+.classList.toggle(
+"hidden",
+t!=="calc"
+);
 
-document.getElementById("settings")
-.classList.toggle("hidden",t!=="settings");
+document.getElementById(
+"settings"
+)
+.classList.toggle(
+"hidden",
+t!=="settings"
+);
 
-document.getElementById("tabCalc")
-.classList.toggle("active",t==="calc");
+document.getElementById(
+"tabCalc"
+)
+.classList.toggle(
+"active",
+t==="calc"
+);
 
-document.getElementById("tabSettings")
-.classList.toggle("active",t==="settings");
+document.getElementById(
+"tabSettings"
+)
+.classList.toggle(
+"active",
+t==="settings"
+);
 
 if(t==="settings")
 renderSettings();
 
 updateKeyStatus();
 
-if(t==="calc"&&map){
+if(
+t==="calc"&&
+map
+){
 
-setTimeout(()=>{
+setTimeout(
+()=>{
 map.invalidateSize();
-},100);
+},
+100
+);
 
 }
 
 }
-
 
 /* =========================================================
    GEOAPIFY
@@ -2686,19 +3663,28 @@ map.invalidateSize();
 
 function getGeoKey(){
 
-return localStorage.getItem("geoapifyApiKey")||"";
+return localStorage.getItem(
+"geoapifyApiKey"
+)||"";
 
 }
 
 function saveGeoKey(){
 
 const k=
-document.getElementById("geoKey").value.trim();
+document.getElementById(
+"geoKey"
+).value.trim();
 
 if(!k)
-return alert("Vlož API klíč.");
+return alert(
+"Vlož API klíč."
+);
 
-localStorage.setItem("geoapifyApiKey",k);
+localStorage.setItem(
+"geoapifyApiKey",
+k
+);
 
 updateKeyStatus();
 
@@ -2709,13 +3695,18 @@ map=null;
 
 initMap();
 
-alert("API klíč uložen.");
+alert(
+"API klíč uložen."
+);
 
 }
 
 function updateKeyStatus(){
 
-const e=document.getElementById("keyStatus");
+const e=
+document.getElementById(
+"keyStatus"
+);
 
 if(!e)
 return;
@@ -2728,9 +3719,19 @@ getGeoKey()
 "API klíč zatím není uložen.";
 
 e.className=
-"note "+(getGeoKey()?"ok":"warn");
+"note "+
+(
+getGeoKey()
+?
+"ok"
+:
+"warn"
+);
 
-const g=document.getElementById("geoKey");
+const g=
+document.getElementById(
+"geoKey"
+);
 
 if(g&&!g.value)
 g.value=getGeoKey();
@@ -2746,7 +3747,10 @@ const k=getGeoKey();
 
 map=
 L.map("map")
-.setView([49.8175,15.473],7);
+.setView(
+[49.8175,15.473],
+7
+);
 
 L.tileLayer(
 k
@@ -2766,7 +3770,6 @@ k
 ).addTo(map);
 
 }
-
 
 /* =========================================================
    HELPERS
@@ -2789,24 +3792,36 @@ c=>
 
 }
 
-function setStatus(t,c=""){
+function setStatus(
+t,
+c=""
+){
 
-const e=document.getElementById("routeStatus");
+const e=
+document.getElementById(
+"routeStatus"
+);
 
 e.textContent=t;
-e.className="routeStatus "+c;
+
+e.className=
+"routeStatus "+c;
 
 }
 
 function debounce(which){
 
-clearTimeout(timers[which]);
+clearTimeout(
+timers[which]
+);
 
 timers[which]=
-setTimeout(()=>suggest(which),300);
+setTimeout(
+()=>suggest(which),
+300
+);
 
 }
-
 
 /* =========================================================
    ADDRESS SUGGESTIONS
@@ -2816,15 +3831,23 @@ async function suggest(which){
 
 const k=getGeoKey();
 
-const el=document.getElementById(which+"Address");
+const el=
+document.getElementById(
+which+"Address"
+);
 
-const box=document.getElementById(which+"Suggestions");
+const box=
+document.getElementById(
+which+"Suggestions"
+);
 
-const q=el.value.trim();
+const q=
+el.value.trim();
 
 if(!k||q.length<3){
 
 box.classList.add("hidden");
+
 return;
 
 }
@@ -2837,23 +3860,37 @@ const u=
 const r=await fetch(u);
 
 if(!r.ok)
-throw new Error("HTTP "+r.status);
+throw new Error(
+"HTTP "+r.status
+);
 
 const j=await r.json();
 
 box.innerHTML=
 (j.results||[])
-.map(p=>
+.map(
+p=>
 `<div class="suggestion">
-${escapeHtml(p.formatted||p.address_line1||"Adresa")}
+${escapeHtml(
+p.formatted||
+p.address_line1||
+"Adresa"
+)}
 </div>`
 )
 .join("");
 
 box
-.querySelectorAll(".suggestion")
-.forEach((x,i)=>
-x.onclick=()=>choose(which,j.results[i])
+.querySelectorAll(
+".suggestion"
+)
+.forEach(
+(x,i)=>
+x.onclick=
+()=>choose(
+which,
+j.results[i]
+)
 );
 
 box.classList.toggle(
@@ -2863,7 +3900,9 @@ box.classList.toggle(
 
 }catch(e){
 
-box.classList.add("hidden");
+box.classList.add(
+"hidden"
+);
 
 setStatus(
 "Vyhledání adresy se nepodařilo. Zkontroluj API klíč.",
@@ -2885,48 +3924,83 @@ places.return
 
 }
 
-function choose(which,p){
+function choose(
+which,
+p
+){
 
 const place={
+
 lat:+p.lat,
+
 lon:+p.lon,
-formatted:p.formatted||p.address_line1||""
+
+formatted:
+p.formatted||
+p.address_line1||
+""
+
 };
 
 places[which]=place;
 
-const input=document.getElementById(which+"Address");
+const input=
+document.getElementById(
+which+"Address"
+);
 
 if(input)
-input.value=place.formatted;
+input.value=
+place.formatted;
 
-const box=document.getElementById(which+"Suggestions");
+const box=
+document.getElementById(
+which+"Suggestions"
+);
 
 if(box)
-box.classList.add("hidden");
+box.classList.add(
+"hidden"
+);
 
-showPlace(which,place);
+showPlace(
+which,
+place
+);
 
-const st=document.getElementById(which+"Status");
+const st=
+document.getElementById(
+which+"Status"
+);
 
 if(st){
 
-st.textContent="✅ "+place.formatted;
-st.className="note ok";
+st.textContent=
+"✅ "+place.formatted;
+
+st.className=
+"note ok";
 
 }
 
 }
 
-function showPlace(which,p){
+function showPlace(
+which,
+p
+){
 
 initMap();
 
 if(markers[which])
-map.removeLayer(markers[which]);
+map.removeLayer(
+markers[which]
+);
 
 markers[which]=
-L.marker([p.lat,p.lon])
+L.marker(
+[p.lat,p.lon]
+)
 .addTo(map)
 .bindPopup(
 (
@@ -2945,19 +4019,36 @@ which==="return"
 "Servis: "
 )
 +
-escapeHtml(p.formatted)
+escapeHtml(
+p.formatted
+)
 );
 
 const pts=
-["from","impact","to","return"]
-.filter(k=>places[k])
-.map(k=>[places[k].lat,places[k].lon]);
+[
+"from",
+"impact",
+"to",
+"return"
+]
+.filter(
+k=>places[k]
+)
+.map(
+k=>
+[
+places[k].lat,
+places[k].lon
+]
+);
 
 if(pts.length>1){
 
 map.fitBounds(
 pts,
-{padding:[25,25]}
+{
+padding:[25,25]
+}
 );
 
 }else{
@@ -2973,18 +4064,25 @@ map.setView(
 
 function useCompany(which){
 
-choose(which,company);
+choose(
+which,
+company
+);
 
 }
 
 function useMyLocation(which){
 
-const s=document.getElementById(which+"Status");
+const s=
+document.getElementById(
+which+"Status"
+);
 
 if(!navigator.geolocation){
 
 if(s)
-s.textContent="Poloha není podporována.";
+s.textContent=
+"Poloha není podporována.";
 
 return;
 
@@ -2992,7 +4090,9 @@ return;
 
 if(s){
 
-s.textContent="📍 Zjišťuji polohu…";
+s.textContent=
+"📍 Zjišťuji polohu…";
+
 s.className="note";
 
 }
@@ -3002,8 +4102,13 @@ navigator.geolocation.getCurrentPosition(
 async pos=>{
 
 const p={
-lat:pos.coords.latitude,
-lon:pos.coords.longitude,
+
+lat:
+pos.coords.latitude,
+
+lon:
+pos.coords.longitude,
+
 formatted:
 `GPS ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`
 };
@@ -3018,6 +4123,7 @@ const u=
 `https://api.geoapify.com/v1/geocode/reverse?lat=${p.lat}&lon=${p.lon}&lang=cs&format=json&apiKey=${encodeURIComponent(k)}`;
 
 const r=await fetch(u);
+
 const j=await r.json();
 
 p.formatted=
@@ -3028,7 +4134,10 @@ p.formatted;
 
 }
 
-choose(which,p);
+choose(
+which,
+p
+);
 
 },
 
@@ -3036,8 +4145,11 @@ choose(which,p);
 
 if(s){
 
-s.textContent="Poloha nebyla povolena.";
-s.className="note error";
+s.textContent=
+"Poloha nebyla povolena.";
+
+s.className=
+"note error";
 
 }
 
@@ -3066,7 +4178,9 @@ const u=
 const r=await fetch(u);
 
 if(!r.ok)
-throw new Error("geocode "+r.status);
+throw new Error(
+"geocode "+r.status
+);
 
 const j=await r.json();
 
@@ -3084,21 +4198,33 @@ null;
 
 }
 
-async function setOCRRoute(client,target){
+async function setOCRRoute(
+client,
+target
+){
 
 try{
 
-const[a,b]=
+const[
+a,
+b
+]=
 await Promise.all([
 geocodeAddress(client),
 geocodeAddress(target)
 ]);
 
 if(a)
-choose("impact",a);
+choose(
+"impact",
+a
+);
 
 if(b)
-choose("to",b);
+choose(
+"to",
+b
+);
 
 if(a&&b){
 
@@ -3122,7 +4248,6 @@ setStatus(
 
 }
 
-
 /* =========================================================
    ROUTING
    ========================================================= */
@@ -3139,6 +4264,7 @@ setStatus(
 );
 
 showTab("settings");
+
 return;
 
 }
@@ -3161,7 +4287,9 @@ places.to,
 places.return
 ];
 
-setStatus("Počítám celou pracovní trasu…");
+setStatus(
+"Počítám celou pracovní trasu…"
+);
 
 (async()=>{
 
@@ -3171,7 +4299,11 @@ let totalM=0;
 let totalSec=0;
 let features=[];
 
-for(let i=0;i<pts.length-1;i++){
+for(
+let i=0;
+i<pts.length-1;
+i++
+){
 
 const way=
 `${pts[i].lat},${pts[i].lon}|${pts[i+1].lat},${pts[i+1].lon}`;
@@ -3182,28 +4314,42 @@ const u=
 const r=await fetch(u);
 
 if(!r.ok)
-throw new Error("HTTP "+r.status);
+throw new Error(
+"HTTP "+r.status
+);
 
 const j=await r.json();
 
-const f=j.features?.[0];
+const f=
+j.features?.[0];
 
 if(!f)
 throw new Error("route");
 
-totalM+=Number(f.properties?.distance)||0;
-totalSec+=Number(f.properties?.time)||0;
+totalM+=
+Number(
+f.properties?.distance
+)||0;
+
+totalSec+=
+Number(
+f.properties?.time
+)||0;
 
 features.push(f);
 
 }
 
 if(routeLayer)
-map.removeLayer(routeLayer);
+map.removeLayer(
+routeLayer
+);
 
-const fg=L.featureGroup();
+const fg=
+L.featureGroup();
 
-features.forEach(f=>
+features.forEach(
+f=>
 L.geoJSON(
 f,
 {
@@ -3215,24 +4361,38 @@ opacity:.85
 ).addTo(fg)
 );
 
-routeLayer=fg.addTo(map);
+routeLayer=
+fg.addTo(map);
 
 map.fitBounds(
 routeLayer.getBounds(),
-{padding:[25,25]}
+{
+padding:[25,25]
+}
 );
 
 const totalKm=
 Math.round(totalM/100)/10;
 
-document.getElementById("km").value=totalKm;
+document.getElementById(
+"km"
+).value=totalKm;
 
 calculate();
 
-renderTripLegs(features);
+renderTripLegs(
+features
+);
 
 setStatus(
-`Celá trasa: ${totalKm.toLocaleString("cs-CZ",{maximumFractionDigits:1})} km • cca ${Math.round(totalSec/60)} min.`,
+`Celá trasa: ${
+totalKm.toLocaleString(
+"cs-CZ",
+{maximumFractionDigits:1}
+)
+} km • cca ${
+Math.round(totalSec/60)
+} min.`,
 "ok"
 );
 
@@ -3251,7 +4411,9 @@ setStatus(
 
 }
 
-function renderTripLegs(features){
+function renderTripLegs(
+features
+){
 
 const names=[
 "Výjezd",
@@ -3260,57 +4422,100 @@ const names=[
 "Návrat"
 ];
 
-const old=document.getElementById("tripLegs");
+const old=
+document.getElementById(
+"tripLegs"
+);
 
 if(old)
 old.remove();
 
-const box=document.createElement("div");
+const box=
+document.createElement(
+"div"
+);
 
 box.id="tripLegs";
 box.className="tripLegs";
 
 let total=0;
 
-features.forEach(f=>
-total+=Number(f.properties?.distance)||0
+features.forEach(
+f=>
+total+=
+Number(
+f.properties?.distance
+)||0
 );
 
 box.innerHTML=
 
 `<div class="tripTotal">
+
 <b>Celá pracovní trasa</b>
+
 <span>
-${(total/1000).toLocaleString("cs-CZ",{maximumFractionDigits:1})} km
+${
+(total/1000).toLocaleString(
+"cs-CZ",
+{maximumFractionDigits:1}
+)
+} km
 </span>
+
 </div>`
 
 +
 
-features.map((f,i)=>
+features.map(
+(f,i)=>
 `<div class="tripLeg">
 
 <span>
+
 ${names[i]} → ${names[i+1]}
+
 <br>
+
 <small>
-${Math.round((Number(f.properties?.time)||0)/60)} min
+${
+Math.round(
+(Number(
+f.properties?.time
+)||0)/60
+)
+} min
 </small>
+
 </span>
 
 <span>
-${((Number(f.properties?.distance)||0)/1000).toLocaleString("cs-CZ",{maximumFractionDigits:1})} km
+${
+(
+(Number(
+f.properties?.distance
+)||0
+)/1000
+).toLocaleString(
+"cs-CZ",
+{maximumFractionDigits:1}
+)
+} km
 </span>
 
 </div>`
 ).join("");
 
 document
-.getElementById("routeStatus")
+.getElementById(
+"routeStatus"
+)
 .parentNode
 .insertBefore(
 box,
-document.getElementById("routeStatus")
+document.getElementById(
+"routeStatus"
+)
 );
 
 }
@@ -3322,23 +4527,36 @@ function clearRoute(){
 "impact",
 "to",
 "return"
-].forEach(k=>{
+].forEach(
+k=>{
 
 places[k]=null;
 
-const el=document.getElementById(k+"Address");
+const el=
+document.getElementById(
+k+"Address"
+);
 
 if(el)
 el.value="";
 
-const st=document.getElementById(k+"Status");
+const st=
+document.getElementById(
+k+"Status"
+);
 
 if(st)
 st.textContent="";
 
-if(markers[k]&&map){
+if(
+markers[k]&&
+map
+){
 
-map.removeLayer(markers[k]);
+map.removeLayer(
+markers[k]
+);
+
 markers[k]=null;
 
 }
@@ -3347,17 +4565,25 @@ markers[k]=null;
 
 if(routeLayer){
 
-map.removeLayer(routeLayer);
+map.removeLayer(
+routeLayer
+);
+
 routeLayer=null;
 
 }
 
-const tl=document.getElementById("tripLegs");
+const tl=
+document.getElementById(
+"tripLegs"
+);
 
 if(tl)
 tl.remove();
 
-document.getElementById("km").value=0;
+document.getElementById(
+"km"
+).value=0;
 
 calculate();
 
@@ -3379,15 +4605,23 @@ calculateRoute();
 
 }
 
-async function geocodeExact(which,text){
+async function geocodeExact(
+which,
+text
+){
 
-const p=await geocodeAddress(text);
+const p=
+await geocodeAddress(
+text
+);
 
 if(p)
-choose(which,p);
+choose(
+which,
+p
+);
 
 }
-
 
 /* =========================================================
    TEXT IMPORT
@@ -3396,18 +4630,26 @@ choose(which,p);
 function toggleImportText(){
 
 document
-.getElementById("importArea")
+.getElementById(
+"importArea"
+)
 .classList
 .toggle("hidden");
 
 if(
 !document
-.getElementById("importArea")
+.getElementById(
+"importArea"
+)
 .classList
 .contains("hidden")
 ){
 
-document.getElementById("orderText").focus();
+document
+.getElementById(
+"orderText"
+)
+.focus();
 
 }
 
@@ -3415,24 +4657,41 @@ document.getElementById("orderText").focus();
 
 async function pasteOrder(){
 
-const area=document.getElementById("importArea");
-const status=document.getElementById("importStatus");
+const area=
+document.getElementById(
+"importArea"
+);
 
-area.classList.remove("hidden");
+const status=
+document.getElementById(
+"importStatus"
+);
 
-status.textContent="📋 Zkusím načíst text ze schránky…";
+area.classList.remove(
+"hidden"
+);
+
+status.textContent=
+"📋 Zkusím načíst text ze schránky…";
 
 try{
 
 if(!navigator.clipboard?.readText)
-throw new Error("clipboard");
+throw new Error(
+"clipboard"
+);
 
-const text=await navigator.clipboard.readText();
+const text=
+await navigator.clipboard.readText();
 
 if(!text.trim())
-throw new Error("empty");
+throw new Error(
+"empty"
+);
 
-document.getElementById("orderText").value=text;
+document.getElementById(
+"orderText"
+).value=text;
 
 parseOrderText();
 
@@ -3441,7 +4700,9 @@ parseOrderText();
 status.textContent=
 "Schránku Safari nemusí povolit automaticky. Klepni do pole níže a zvol Vložit.";
 
-document.getElementById("orderText").focus();
+document.getElementById(
+"orderText"
+).focus();
 
 }
 
@@ -3451,15 +4712,26 @@ function cleanValue(s){
 
 return String(s||"")
 .replace(/\s+/g," ")
-.replace(/^[\s:–-]+|[\s:–-]+$/g,"")
+.replace(
+/^[\s:–-]+|[\s:–-]+$/g,
+""
+)
 .trim();
 
 }
 
-function extractBetween(text,start,end){
+function extractBetween(
+text,
+start,
+end
+){
 
 const a=
-text.toLowerCase().indexOf(start.toLowerCase());
+text
+.toLowerCase()
+.indexOf(
+start.toLowerCase()
+);
 
 if(a<0)
 return "";
@@ -3467,7 +4739,9 @@ return "";
 const b=
 end
 ?
-text.toLowerCase().indexOf(
+text
+.toLowerCase()
+.indexOf(
 end.toLowerCase(),
 a+start.length
 )
@@ -3477,27 +4751,36 @@ a+start.length
 return cleanValue(
 text.slice(
 a+start.length,
-b<0?text.length:b
+b<0
+?
+text.length
+:
+b
 )
 );
 
 }
 
-
 /* =========================================================
    CASE NUMBER
    ========================================================= */
 
-function extractCaseNumber(text){
+function extractCaseNumber(
+text
+){
 
-const raw=String(text||"");
+const raw=
+String(text||"");
 
 const direct=
 raw.match(
 /(?:Číslo|Cislo)\s+případu\s*[:\-]?\s*([A-Z0-9][A-Z0-9._\/-]*)/i
 );
 
-if(direct&&direct[1])
+if(
+direct&&
+direct[1]
+)
 return direct[1].trim();
 
 const fallback=
@@ -3513,19 +4796,25 @@ fallback[0].trim()
 
 }
 
-
 /* =========================================================
    LIMIT
    ========================================================= */
 
-function extractLimitInfo(text){
+function extractLimitInfo(
+text
+){
 
-const raw=String(text||"");
+const raw=
+String(text||"");
 
 if(
 /reáln[eé]\s+n[aá]klady/i.test(raw) ||
 /realne\s+naklady/i.test(
-raw.normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+raw.normalize("NFD")
+.replace(
+/[\u0300-\u036f]/g,
+""
+)
 )
 ){
 
@@ -3546,7 +4835,10 @@ if(m){
 return{
 mode:"amount",
 value:Number(
-m[1].replace(/[ .]/g,"")
+m[1].replace(
+/[ .]/g,
+""
+)
 )
 };
 
@@ -3558,10 +4850,18 @@ const nums=
 /(\d[\d .]{2,})\s*(?:CZK|K[cč])/gi
 )
 ]
-.map(m=>
-Number(m[1].replace(/[ .]/g,""))
+.map(
+m=>
+Number(
+m[1].replace(
+/[ .]/g,
+""
 )
-.filter(n=>n>=100);
+)
+)
+.filter(
+n=>n>=100
+);
 
 if(nums.length){
 
@@ -3579,7 +4879,6 @@ value:null
 
 }
 
-
 /* =========================================================
    TEXT PARSER
    ========================================================= */
@@ -3587,23 +4886,29 @@ value:null
 function parseOrderText(){
 
 const t=
-document.getElementById("orderText").value.trim();
+document.getElementById(
+"orderText"
+).value.trim();
 
 const status=
-document.getElementById("importStatus");
+document.getElementById(
+"importStatus"
+);
 
 if(!t){
 
 status.textContent=
 "Nejdřív vlož text zakázky.";
 
-status.className="note warn";
+status.className=
+"note warn";
 
 return;
 
 }
 
-const caseNo=extractCaseNumber(t);
+const caseNo=
+extractCaseNumber(t);
 
 let from=
 extractBetween(
@@ -3643,11 +4948,21 @@ to.replace(
 }
 
 const d={
+
 caseNo,
-client:cleanValue(from),
-target:cleanValue(to),
-limit:limitInfo.value,
-limitMode:limitInfo.mode
+
+client:
+cleanValue(from),
+
+target:
+cleanValue(to),
+
+limit:
+limitInfo.value,
+
+limitMode:
+limitInfo.mode
+
 };
 
 mergeOcrData(d);
@@ -3655,44 +4970,56 @@ mergeOcrData(d);
 const found=[];
 
 if(caseNo)
-found.push("číslo případu");
+found.push(
+"číslo případu"
+);
 
 if(from)
-found.push("zásah");
+found.push(
+"zásah"
+);
 
 if(to)
-found.push("servis");
+found.push(
+"servis"
+);
 
 if(limitInfo.mode==="amount")
-found.push("limit");
+found.push(
+"limit"
+);
 
 if(limitInfo.mode==="real")
-found.push("reálné náklady");
+found.push(
+"reálné náklady"
+);
 
 if(!found.length){
 
 status.textContent=
 "Údaje se nepodařilo rozpoznat.";
 
-status.className="note error";
+status.className=
+"note error";
 
 return;
 
 }
 
 status.textContent=
-"✅ Načteno: "+found.join(", ")+
+"✅ Načteno: "+
+found.join(", ")+
 ". Údaje byly přidány do rozpracované zakázky.";
 
-status.className="note ok";
+status.className=
+"note ok";
 
 calculate();
 
 }
 
-
 /* =========================================================
-   DOKUMENTACE
+   DOCUMENTATION
    ========================================================= */
 
 const DOC_DEFS=[
@@ -3735,33 +5062,49 @@ desc:"Dokument"
 
 ];
 
+function docsStatus(
+msg,
+cls=""
+){
 
-function docsStatus(msg,cls=""){
-
-const e=document.getElementById("docsStatus");
+const e=
+document.getElementById(
+"docsStatus"
+);
 
 if(!e)
 return;
 
 e.textContent=msg;
-e.className="routeStatus "+cls;
+
+e.className=
+"routeStatus "+cls;
 
 }
 
-function safeStoragePart(value){
+function safeStoragePart(
+value
+){
 
 return String(value||"")
 .trim()
-.replace(/[^a-zA-Z0-9_-]/g,"_");
+.replace(
+/[^a-zA-Z0-9_-]/g,
+"_"
+);
 
 }
 
 function docsDriverValue(){
 
 return (
-document.getElementById("docsDriver")?.value.trim()
+document.getElementById(
+"docsDriver"
+)?.value.trim()
 ||
-document.getElementById("dispatchDriver")?.value.trim()
+document.getElementById(
+"dispatchDriver"
+)?.value.trim()
 ||
 dispatchCfg().driver
 ||
@@ -3770,18 +5113,28 @@ dispatchCfg().driver
 
 }
 
-function docsSetDriver(driver){
+function docsSetDriver(
+driver
+){
 
-const value=String(driver||"driver1").trim();
+const value=
+String(
+driver||"driver1"
+).trim();
 
-const a=document.getElementById("docsDriver");
+const a=
+document.getElementById(
+"docsDriver"
+);
 
 if(a)
 a.value=value;
 
 }
 
-function docsJobLabel(job){
+function docsJobLabel(
+job
+){
 
 return (
 job.cislo_zakazky
@@ -3793,24 +5146,35 @@ job.id
 
 }
 
-function docsStateLabel(stav){
+function docsStateLabel(
+stav
+){
 
 const map={
+
 nova:"Nová",
+
 na_miste:"Na místě",
+
 v_servisu:"V servisu",
+
 dokoncena:"Dokončená",
+
 "dokončena":"Dokončená"
+
 };
 
-return map[stav]||stav||"—";
+return map[stav]||
+stav||
+"—";
 
 }
 
-
 async function loadDocumentationJobs(){
 
-if(!(await ensureDispatchSupabase())){
+if(
+!(await ensureDispatchSupabase())
+){
 
 docsStatus(
 "❌ Supabase není připravené.",
@@ -3821,21 +5185,31 @@ return;
 
 }
 
-const driver=docsDriverValue();
+const driver=
+docsDriverValue();
 
-docsSetDriver(driver);
+docsSetDriver(
+driver
+);
 
-const select=document.getElementById("docsJobSelect");
+const select=
+document.getElementById(
+"docsJobSelect"
+);
 
 if(!select)
 return;
 
-docsStatus("⏳ Načítám zakázky…");
+docsStatus(
+"⏳ Načítám zakázky…"
+);
 
 select.innerHTML=
 '<option value="">⏳ Načítám…</option>';
 
-document.getElementById("deleteJobButton").disabled=true;
+document.getElementById(
+"deleteJobButton"
+).disabled=true;
 
 try{
 
@@ -3845,13 +5219,17 @@ await tbDispatch
 .select(
 "id,cislo_zakazky,ridic_id,stav,zasah,servis"
 )
-.eq("ridic_id",driver)
+.eq(
+"ridic_id",
+driver
+)
 .limit(50);
 
 if(result.error)
 throw result.error;
 
-const jobs=result.data||[];
+const jobs=
+result.data||[];
 
 select.innerHTML=
 '<option value="">Vyber zakázku…</option>';
@@ -3867,33 +5245,56 @@ return;
 
 }
 
-jobs.sort((a,b)=>{
+jobs.sort(
+(a,b)=>{
 
-const ad=a.stav==="dokoncena"?0:1;
-const bd=b.stav==="dokoncena"?0:1;
+const ad=
+a.stav==="dokoncena"
+?
+0
+:
+1;
+
+const bd=
+b.stav==="dokoncena"
+?
+0
+:
+1;
 
 if(ad!==bd)
 return ad-bd;
 
-return String(b.cislo_zakazky||b.id)
+return String(
+b.cislo_zakazky||b.id
+)
 .localeCompare(
-String(a.cislo_zakazky||a.id)
+String(
+a.cislo_zakazky||a.id
+)
 );
 
 });
 
-jobs.forEach(job=>{
+jobs.forEach(
+job=>{
 
-const option=document.createElement("option");
+const option=
+document.createElement(
+"option"
+);
 
 option.value=job.id;
 
 option.textContent=
 `${docsJobLabel(job)} • ${docsStateLabel(job.stav)}`;
 
-option.dataset.job=JSON.stringify(job);
+option.dataset.job=
+JSON.stringify(job);
 
-select.appendChild(option);
+select.appendChild(
+option
+);
 
 });
 
@@ -3903,17 +5304,22 @@ docsStatus(
 );
 
 if(jobs.length===1)
-select.value=jobs[0].id;
+select.value=
+jobs[0].id;
 
 }catch(e){
 
-console.error("Documentation jobs:",e);
+console.error(
+"Documentation jobs:",
+e
+);
 
 select.innerHTML=
 '<option value="">Chyba načtení</option>';
 
 docsStatus(
-"❌ Zakázky se nepodařilo načíst: "+(e.message||"chyba"),
+"❌ Zakázky se nepodařilo načíst: "+
+(e.message||"chyba"),
 "error"
 );
 
@@ -3921,8 +5327,10 @@ docsStatus(
 
 }
 
-
-function findDocFile(files,key){
+function findDocFile(
+files,
+key
+){
 
 const extensions=[
 "jpg",
@@ -3931,11 +5339,15 @@ const extensions=[
 "webp"
 ];
 
-for(const ext of extensions){
+for(
+const ext of extensions
+){
 
 const found=
 files.find(
-f=>f.name===`${key}.${ext}`
+f=>
+f.name===
+`${key}.${ext}`
 );
 
 if(found)
@@ -3947,7 +5359,9 @@ return null;
 
 }
 
-function getDocPublicUrl(path){
+function getDocPublicUrl(
+path
+){
 
 const result=
 tbDispatch
@@ -3959,14 +5373,15 @@ return result?.data?.publicUrl||"";
 
 }
 
-
 /* =========================================================
    LOAD DOCUMENTATION
    ========================================================= */
 
 async function loadSelectedDocumentation(){
 
-if(!(await ensureDispatchSupabase())){
+if(
+!(await ensureDispatchSupabase())
+){
 
 docsStatus(
 "❌ Supabase není připravené.",
@@ -3977,9 +5392,13 @@ return;
 
 }
 
-const select=document.getElementById("docsJobSelect");
+const select=
+document.getElementById(
+"docsJobSelect"
+);
 
-const jobId=select?.value;
+const jobId=
+select?.value;
 
 if(!jobId){
 
@@ -3992,18 +5411,27 @@ return;
 
 }
 
-const option=select.options[select.selectedIndex];
+const option=
+select.options[
+select.selectedIndex
+];
 
 let job=null;
 
 try{
 
 if(option?.dataset.job)
-job=JSON.parse(option.dataset.job);
+job=
+JSON.parse(
+option.dataset.job
+);
 
 }catch(e){
 
-console.warn("Job JSON parse:",e);
+console.warn(
+"Job JSON parse:",
+e
+);
 
 }
 
@@ -4018,40 +5446,75 @@ return;
 
 }
 
-const deleteBtn=document.getElementById("deleteJobButton");
+const deleteBtn=
+document.getElementById(
+"deleteJobButton"
+);
 
 if(deleteBtn)
 deleteBtn.disabled=false;
 
 const driver=
 safeStoragePart(
-job.ridic_id||docsDriverValue()
+job.ridic_id||
+docsDriverValue()
 );
 
 const jobFolder=
-safeStoragePart(job.id);
+safeStoragePart(
+job.id
+);
 
 const folder=
 `${driver}/${jobFolder}`;
 
-docsStatus("⏳ Načítám dokumentaci…");
+docsStatus(
+"⏳ Načítám dokumentaci…"
+);
 
-const info=document.getElementById("docsJobInfo");
+const info=
+document.getElementById(
+"docsJobInfo"
+);
 
 if(info){
 
-info.classList.remove("hidden");
+info.classList.remove(
+"hidden"
+);
 
 info.innerHTML=
 
-`<b>Zakázka:</b> ${escapeHtml(docsJobLabel(job))}<br>`+
-`<b>Stav:</b> ${escapeHtml(docsStateLabel(job.stav))}<br>`+
-`<b>Zásah:</b> ${escapeHtml(job.zasah||"—")}<br>`+
-`<b>Servis:</b> ${escapeHtml(job.servis||"—")}`;
+`<b>Zakázka:</b> ${
+escapeHtml(
+docsJobLabel(job)
+)
+}<br>`+
+
+`<b>Stav:</b> ${
+escapeHtml(
+docsStateLabel(job.stav)
+)
+}<br>`+
+
+`<b>Zásah:</b> ${
+escapeHtml(
+job.zasah||"—"
+)
+}<br>`+
+
+`<b>Servis:</b> ${
+escapeHtml(
+job.servis||"—"
+)
+}`;
 
 }
 
-const grid=document.getElementById("docsGrid");
+const grid=
+document.getElementById(
+"docsGrid"
+);
 
 if(grid)
 grid.innerHTML="";
@@ -4077,30 +5540,46 @@ order:"asc"
 if(result.error)
 throw result.error;
 
-const files=(result.data||[])
-.filter(f=>f.id!==null);
+const files=
+(result.data||[])
+.filter(
+f=>f.id!==null
+);
 
 let count=0;
 
-DOC_DEFS.forEach(doc=>{
+DOC_DEFS.forEach(
+doc=>{
 
-const file=findDocFile(files,doc.key);
+const file=
+findDocFile(
+files,
+doc.key
+);
 
 if(!file)
 return;
 
-const path=`${folder}/${file.name}`;
+const path=
+`${folder}/${file.name}`;
 
-const url=getDocPublicUrl(path);
+const url=
+getDocPublicUrl(
+path
+);
 
 if(!url)
 return;
 
 count++;
 
-const item=document.createElement("div");
+const item=
+document.createElement(
+"div"
+);
 
-item.className="docItem";
+item.className=
+"docItem";
 
 item.innerHTML=
 
@@ -4142,23 +5621,33 @@ onclick="downloadDocumentationFile(${JSON.stringify(url)})">
 
 </div>`;
 
-grid.appendChild(item);
+grid.appendChild(
+item
+);
 
 });
 
-
 if(count<6){
 
-DOC_DEFS.forEach(doc=>{
+DOC_DEFS.forEach(
+doc=>{
 
-const exists=findDocFile(files,doc.key);
+const exists=
+findDocFile(
+files,
+doc.key
+);
 
 if(exists)
 return;
 
-const item=document.createElement("div");
+const item=
+document.createElement(
+"div"
+);
 
-item.className="docItem docMissing";
+item.className=
+"docItem docMissing";
 
 item.innerHTML=
 
@@ -4176,7 +5665,9 @@ ${escapeHtml(doc.title)}
 ${escapeHtml(doc.desc)}
 </div>`;
 
-grid.appendChild(item);
+grid.appendChild(
+item
+);
 
 });
 
@@ -4185,8 +5676,12 @@ grid.appendChild(item);
 if(!count){
 
 grid.innerHTML=
-`<div class="docsEmpty" style="grid-column:1/-1">
+`<div
+class="docsEmpty"
+style="grid-column:1/-1">
+
 📭 U této zakázky zatím nebyla nalezena žádná dokumentace.
+
 </div>`;
 
 docsStatus(
@@ -4200,28 +5695,40 @@ return;
 
 docsStatus(
 `✅ Dokumentace: ${count} / 6 souborů.`,
-count===6?"ok":"warn"
+count===6
+?
+"ok"
+:
+"warn"
 );
 
 }catch(e){
 
-console.error("Documentation load:",e);
+console.error(
+"Documentation load:",
+e
+);
 
 if(grid){
 
 grid.innerHTML=
-`<div class="docsEmpty" style="grid-column:1/-1">
+`<div
+class="docsEmpty"
+style="grid-column:1/-1">
 
 ❌ Dokumentaci se nepodařilo načíst.<br><br>
 
-${escapeHtml(e.message||"Chyba")}
+${escapeHtml(
+e.message||"Chyba"
+)}
 
 </div>`;
 
 }
 
 docsStatus(
-"❌ Chyba při načítání dokumentace: "+(e.message||"chyba"),
+"❌ Chyba při načítání dokumentace: "+
+(e.message||"chyba"),
 "error"
 );
 
@@ -4229,6 +5736,116 @@ docsStatus(
 
 }
 
+/* =========================================================
+   POTVRZENÍ SMAZÁNÍ
+   ========================================================= */
+
+function showDeleteConfirm(
+label
+){
+
+return new Promise(
+resolve=>{
+
+const overlay=
+document.getElementById(
+"confirmOverlay"
+);
+
+const text=
+document.getElementById(
+"confirmText"
+);
+
+const cancel=
+document.getElementById(
+"confirmCancel"
+);
+
+const confirmBtn=
+document.getElementById(
+"confirmDelete"
+);
+
+if(
+!overlay||
+!text||
+!cancel||
+!confirmBtn
+){
+
+resolve(false);
+
+return;
+
+}
+
+text.innerHTML=
+
+`Opravdu smazat zakázku
+<b>${escapeHtml(label)}</b>
+včetně dokumentace?<br><br>
+
+Zakázka bude odstraněna z databáze
+a ze Storage budou odstraněny
+fotografie i zakázkový list.<br><br>
+
+<b>Tato akce je nevratná.</b>`;
+
+confirmBtn.textContent=
+"🗑️ ANO, SMAZAT";
+
+overlay.classList.remove(
+"hidden"
+);
+
+const onCancel=()=>{
+
+cleanup();
+
+resolve(false);
+
+};
+
+const onConfirm=()=>{
+
+cleanup();
+
+resolve(true);
+
+};
+
+function cleanup(){
+
+overlay.classList.add(
+"hidden"
+);
+
+cancel.removeEventListener(
+"click",
+onCancel
+);
+
+confirmBtn.removeEventListener(
+"click",
+onConfirm
+);
+
+}
+
+cancel.addEventListener(
+"click",
+onCancel
+);
+
+confirmBtn.addEventListener(
+"click",
+onConfirm
+);
+
+});
+
+}
 
 /* =========================================================
    DELETE JOB + STORAGE
@@ -4236,7 +5853,9 @@ docsStatus(
 
 async function deleteSelectedJob(){
 
-if(!(await ensureDispatchSupabase())){
+if(
+!(await ensureDispatchSupabase())
+){
 
 docsStatus(
 "❌ Supabase není připravené.",
@@ -4247,9 +5866,13 @@ return;
 
 }
 
-const select=document.getElementById("docsJobSelect");
+const select=
+document.getElementById(
+"docsJobSelect"
+);
 
-const jobId=select?.value;
+const jobId=
+select?.value;
 
 if(!jobId){
 
@@ -4262,18 +5885,27 @@ return;
 
 }
 
-const option=select.options[select.selectedIndex];
+const option=
+select.options[
+select.selectedIndex
+];
 
 let job=null;
 
 try{
 
 if(option?.dataset.job)
-job=JSON.parse(option.dataset.job);
+job=
+JSON.parse(
+option.dataset.job
+);
 
 }catch(e){
 
-console.warn(e);
+console.warn(
+"Job JSON parse:",
+e
+);
 
 }
 
@@ -4291,17 +5923,24 @@ return;
 const label=
 docsJobLabel(job);
 
-if(!confirm(
 
-`Opravdu smazat zakázku ${label} včetně dokumentace?\n\n`+
-`Zakázka bude odstraněna z databáze a z Storage budou odstraněny `+
-`fotografie i zakázkový list.\n\n`+
-`Tato akce je nevratná.`
+/*
+ * Vlastní potvrzení přímo v aplikaci.
+ * Žádný window.confirm().
+ */
+const confirmed=
+await showDeleteConfirm(
+label
+);
 
-))
+if(!confirmed)
 return;
 
-const btn=document.getElementById("deleteJobButton");
+
+const btn=
+document.getElementById(
+"deleteJobButton"
+);
 
 if(btn)
 btn.disabled=true;
@@ -4314,11 +5953,13 @@ try{
 
 const driver=
 safeStoragePart(
-job.ridic_id||docsDriverValue()
+job.ridic_id||
+docsDriverValue()
 );
 
 const folder=
 `${driver}/${safeStoragePart(job.id)}`;
+
 
 /*
  * Aktuální Driver používá JPG.
@@ -4326,14 +5967,16 @@ const folder=
  */
 const paths=[];
 
-DOC_DEFS.forEach(doc=>{
+DOC_DEFS.forEach(
+doc=>{
 
 [
 "jpg",
 "jpeg",
 "png",
 "webp"
-].forEach(ext=>{
+].forEach(
+ext=>{
 
 paths.push(
 `${folder}/${doc.key}.${ext}`
@@ -4343,17 +5986,22 @@ paths.push(
 
 });
 
+
 const storageResult=
 await tbDispatch
 .storage
 .from(DOCS_BUCKET)
 .remove(paths);
 
-if(storageResult.error)
+if(storageResult.error){
+
 throw new Error(
 "Dokumentaci se nepodařilo smazat: "+
 storageResult.error.message
 );
+
+}
+
 
 /*
  * Storage je pryč.
@@ -4363,7 +6011,10 @@ const dbResult=
 await tbDispatch
 .from("zakazky")
 .delete()
-.eq("id",job.id);
+.eq(
+"id",
+job.id
+);
 
 if(dbResult.error){
 
@@ -4374,38 +6025,60 @@ dbResult.error.message
 
 }
 
+
+/*
+ * Vyčistíme zobrazení.
+ */
 select.value="";
 
-const info=document.getElementById("docsJobInfo");
+const info=
+document.getElementById(
+"docsJobInfo"
+);
 
 if(info){
 
-info.classList.add("hidden");
+info.classList.add(
+"hidden"
+);
+
 info.innerHTML="";
 
 }
 
-const grid=document.getElementById("docsGrid");
+const grid=
+document.getElementById(
+"docsGrid"
+);
 
 if(grid)
 grid.innerHTML="";
+
 
 docsStatus(
 `✅ Zakázka ${label} a její dokumentace byly smazány.`,
 "ok"
 );
 
+
+/*
+ * Znovu načteme seznam.
+ */
 await loadDocumentationJobs();
 
 }catch(e){
 
-console.error("Delete job:",e);
+console.error(
+"Delete job:",
+e
+);
 
 if(btn)
 btn.disabled=false;
 
 docsStatus(
-"❌ Mazání se nepodařilo dokončit: "+(e.message||"chyba"),
+"❌ Mazání se nepodařilo dokončit: "+
+(e.message||"chyba"),
 "error"
 );
 
@@ -4413,12 +6086,13 @@ docsStatus(
 
 }
 
-
 /* =========================================================
    OPEN / DOWNLOAD
    ========================================================= */
 
-function openDocumentationFile(url){
+function openDocumentationFile(
+url
+){
 
 if(!url)
 return;
@@ -4431,13 +6105,19 @@ url,
 
 }
 
-function downloadDocumentationFile(url){
+function downloadDocumentationFile(
+url
+){
 
 if(!url)
 return;
 
 const separator=
-url.includes("?")?"&":"?";
+url.includes("?")
+?
+"&"
+:
+"?";
 
 window.open(
 url+separator+"download",
@@ -4446,7 +6126,6 @@ url+separator+"download",
 );
 
 }
-
 
 /* =========================================================
    ADDRESS EVENTS
@@ -4457,10 +6136,13 @@ url+separator+"download",
 "impact",
 "to",
 "return"
-].forEach(which=>
+].forEach(
+which=>
 
 document
-.getElementById(which+"Address")
+.getElementById(
+which+"Address"
+)
 .addEventListener(
 "input",
 ()=>debounce(which)
@@ -4472,17 +6154,27 @@ document.addEventListener(
 "click",
 e=>{
 
-if(!e.target.closest(".addressBox")){
+if(
+!e.target.closest(
+".addressBox"
+)
+){
 
 document
-.querySelectorAll(".suggestions")
-.forEach(x=>x.classList.add("hidden"));
+.querySelectorAll(
+".suggestions"
+)
+.forEach(
+x=>
+x.classList.add(
+"hidden"
+)
+);
 
 }
 
 }
 );
-
 
 /* =========================================================
    INIT
@@ -4496,19 +6188,29 @@ calculate();
 
 initMap();
 
-const _dc=dispatchCfg();
+const _dc=
+dispatchCfg();
 
 if(_dc.key){
 
-document.getElementById("supabaseKey").value=_dc.key;
+document.getElementById(
+"supabaseKey"
+).value=
+_dc.key;
 
-document.getElementById("defaultDriver").value=
+document.getElementById(
+"defaultDriver"
+).value=
 _dc.driver||"driver1";
 
-document.getElementById("dispatchDriver").value=
+document.getElementById(
+"dispatchDriver"
+).value=
 _dc.driver||"driver1";
 
-document.getElementById("docsDriver").value=
+document.getElementById(
+"docsDriver"
+).value=
 _dc.driver||"driver1";
 
 initDispatchSupabase();
@@ -4523,15 +6225,20 @@ dispatchConnectionStatus(
 
 window.addEventListener(
 "load",
-()=>setTimeout(initMap,100)
+()=>
+setTimeout(
+initMap,
+100
+)
 );
-
 
 /* =========================================================
    SERVICE WORKER
    ========================================================= */
 
-if("serviceWorker" in navigator){
+if(
+"serviceWorker" in navigator
+){
 
 window.addEventListener(
 "load",
@@ -4543,13 +6250,14 @@ navigator.serviceWorker.register(
 
 }
 
-
 /* =========================================================
    DOCUMENTATION DRIVER SYNC
    ========================================================= */
 
 const docsDriverEl=
-document.getElementById("docsDriver");
+document.getElementById(
+"docsDriver"
+);
 
 if(docsDriverEl){
 
@@ -4558,7 +6266,9 @@ docsDriverEl.addEventListener(
 ()=>{
 
 const select=
-document.getElementById("docsJobSelect");
+document.getElementById(
+"docsJobSelect"
+);
 
 if(select){
 
@@ -4567,21 +6277,33 @@ select.innerHTML=
 
 }
 
-const grid=document.getElementById("docsGrid");
+const grid=
+document.getElementById(
+"docsGrid"
+);
 
 if(grid)
 grid.innerHTML="";
 
-const info=document.getElementById("docsJobInfo");
+const info=
+document.getElementById(
+"docsJobInfo"
+);
 
 if(info){
 
-info.classList.add("hidden");
+info.classList.add(
+"hidden"
+);
+
 info.innerHTML="";
 
 }
 
-const deleteBtn=document.getElementById("deleteJobButton");
+const deleteBtn=
+document.getElementById(
+"deleteJobButton"
+);
 
 if(deleteBtn)
 deleteBtn.disabled=true;
@@ -4597,7 +6319,6 @@ docsStatus(
 
 </script>
 
-
 <!-- =======================================================
      OCR ENGINE
      ======================================================= -->
@@ -4609,9 +6330,18 @@ docsStatus(
 function norm(v){
 
 return String(v||"")
-.replace(/\u00a0/g," ")
-.replace(/\r/g,"")
-.replace(/[ \t]+/g," ")
+.replace(
+/\u00a0/g,
+" "
+)
+.replace(
+/\r/g,
+""
+)
+.replace(
+/[ \t]+/g,
+" "
+)
 .trim();
 
 }
@@ -4620,7 +6350,10 @@ function fold(s){
 
 return String(s||"")
 .normalize("NFD")
-.replace(/[\u0300-\u036f]/g,"")
+.replace(
+/[\u0300-\u036f]/g,
+""
+)
 .toLowerCase();
 
 }
@@ -4628,27 +6361,38 @@ return String(s||"")
 function cleanOcrLine(s){
 
 return norm(s)
-.replace(/^[|Il1\[\]{}]+/,"")
-.replace(/[|]+$/,"")
+.replace(
+/^[|Il1\[\]{}]+/,
+""
+)
+.replace(
+/[|]+$/,
+""
+)
 .trim();
 
 }
-
 
 /* =========================================================
    OCR CASE NUMBER
    ========================================================= */
 
-function extractOcrCaseNumber(text){
+function extractOcrCaseNumber(
+text
+){
 
-const raw=String(text||"");
+const raw=
+String(text||"");
 
 const direct=
 raw.match(
 /(?:Číslo|Cislo)\s+případu\s*[:\-]?\s*([A-Z0-9][A-Z0-9._\/-]*)/i
 );
 
-if(direct&&direct[1])
+if(
+direct&&
+direct[1]
+)
 return direct[1].trim();
 
 const fallback=
@@ -4664,16 +6408,19 @@ fallback[0].trim()
 
 }
 
-
 /* =========================================================
    OCR LIMIT
    ========================================================= */
 
-function extractOcrLimit(text){
+function extractOcrLimit(
+text
+){
 
-const raw=String(text||"");
+const raw=
+String(text||"");
 
-const folded=fold(raw);
+const folded=
+fold(raw);
 
 if(
 /re[aá]ln[eé]\s+n[aá]klady/i.test(raw) ||
@@ -4697,7 +6444,10 @@ if(lm){
 return{
 mode:"amount",
 value:Number(
-lm[1].replace(/[ .]/g,"")
+lm[1].replace(
+/[ .]/g,
+""
+)
 )
 };
 
@@ -4710,7 +6460,13 @@ const nums=
 )
 ]
 .map(
-m=>Number(m[1].replace(/[ .]/g,""))
+m=>
+Number(
+m[1].replace(
+/[ .]/g,
+""
+)
+)
 )
 .filter(
 n=>n>=100
@@ -4732,7 +6488,6 @@ value:null
 
 }
 
-
 /* =========================================================
    OCR PARSER
    ========================================================= */
@@ -4745,7 +6500,8 @@ String(text||"")
 .map(cleanOcrLine)
 .filter(Boolean);
 
-const all=lines.join("\n");
+const all=
+lines.join("\n");
 
 const heads=[
 
@@ -4761,53 +6517,87 @@ const heads=[
 
 ];
 
-function isHeading(line){
+function isHeading(
+line
+){
 
 const f=
 fold(line)
-.replace(/[:.-]+$/,"")
+.replace(
+/[:.-]+$/,
+""
+)
 .trim();
 
 return heads.some(
-w=>f===w||f.startsWith(w+" ")
+w=>
+f===w||
+f.startsWith(w+" ")
 );
 
 }
 
-function collectAfter(labels,maxLines){
+function collectAfter(
+labels,
+maxLines
+){
 
-const fl=labels.map(fold);
+const fl=
+labels.map(fold);
 
-for(let i=0;i<lines.length;i++){
+for(
+let i=0;
+i<lines.length;
+i++
+){
 
-const raw=lines[i];
-const low=fold(raw);
+const raw=
+lines[i];
 
-for(const label of fl){
+const low=
+fold(raw);
 
-const idx=low.indexOf(label);
+for(
+const label of fl
+){
+
+const idx=
+low.indexOf(label);
 
 if(idx<0)
 continue;
 
 const same=
 raw
-.slice(idx+label.length)
-.replace(/^[\s:：\-–—]+/,"")
+.slice(
+idx+label.length
+)
+.replace(
+/^[\s:：\-–—]+/,
+""
+)
 .trim();
 
 const out=[];
 
-if(same&&same.length>2)
+if(
+same&&
+same.length>2
+)
 out.push(same);
 
 for(
 let j=i+1;
-j<Math.min(lines.length,i+1+maxLines);
+j<
+Math.min(
+lines.length,
+i+1+maxLines
+);
 j++
 ){
 
-const n=lines[j];
+const n=
+lines[j];
 
 if(isHeading(n))
 break;
@@ -4865,7 +6655,10 @@ all.match(
 );
 
 if(m)
-client=cleanOcrLine(m[1]);
+client=
+cleanOcrLine(
+m[1]
+);
 
 }
 
@@ -4877,24 +6670,37 @@ all.match(
 );
 
 if(m)
-target=cleanOcrLine(m[0]);
+target=
+cleanOcrLine(
+m[0]
+);
 
 }
 
 const caseNo=
-extractOcrCaseNumber(all);
+extractOcrCaseNumber(
+all
+);
 
 const limitInfo=
-extractOcrLimit(all);
+extractOcrLimit(
+all
+);
 
 client=
 client
-.replace(/^[|Il1\[\]{}]+/,"")
+.replace(
+/^[|Il1\[\]{}]+/,
+""
+)
 .trim();
 
 target=
 target
-.replace(/^[|Il1\[\]{}]+/,"")
+.replace(
+/^[|Il1\[\]{}]+/,
+""
+)
 .trim();
 
 return{
@@ -4913,20 +6719,27 @@ limitInfo.mode
 
 }
 
-
 /* =========================================================
    IMAGE PREPROCESS
    ========================================================= */
 
-function preprocess(file,scale=2){
+function preprocess(
+file,
+scale=2
+){
 
-return new Promise((resolve,reject)=>{
+return new Promise(
+(resolve,reject)=>{
 
-const img=new Image();
+const img=
+new Image();
 
 img.onload=()=>{
 
-const c=document.createElement("canvas");
+const c=
+document.createElement(
+"canvas"
+);
 
 c.width=
 Math.min(
@@ -4937,13 +6750,18 @@ img.naturalWidth*scale,
 c.height=
 Math.round(
 img.naturalHeight*
-(c.width/img.naturalWidth)
+(
+c.width/
+img.naturalWidth
+)
 );
 
 const ctx=
 c.getContext(
 "2d",
-{willReadFrequently:true}
+{
+willReadFrequently:true
+}
 );
 
 ctx.drawImage(
@@ -4962,7 +6780,8 @@ c.width,
 c.height
 );
 
-const d=im.data;
+const d=
+im.data;
 
 for(
 let i=0;
@@ -4994,7 +6813,11 @@ d[i+2]=v;
 
 }
 
-ctx.putImageData(im,0,0);
+ctx.putImageData(
+im,
+0,
+0
+);
 
 c.toBlob(
 b=>
@@ -5002,7 +6825,11 @@ b
 ?
 resolve(b)
 :
-reject(new Error("Canvas conversion failed")),
+reject(
+new Error(
+"Canvas conversion failed"
+)
+),
 "image/png",
 1
 );
@@ -5011,38 +6838,46 @@ reject(new Error("Canvas conversion failed")),
 
 img.onerror=reject;
 
-img.src=URL.createObjectURL(file);
+img.src=
+URL.createObjectURL(file);
 
 });
 
 }
 
-
 /* =========================================================
    OCR STATUS
    ========================================================= */
 
-function setOCRStatus(msg,cls){
+function setOCRStatus(
+msg,
+cls
+){
 
-const e=document.getElementById("ocrStatus");
+const e=
+document.getElementById(
+"ocrStatus"
+);
 
 if(e){
 
 e.textContent=msg;
 
 e.className=
-"routeStatus "+(cls||"");
+"routeStatus "+
+(cls||"");
 
 }
 
 }
-
 
 /* =========================================================
    OCR RUN
    ========================================================= */
 
-async function run(file){
+async function run(
+file
+){
 
 if(!window.Tesseract){
 
@@ -5062,7 +6897,10 @@ setOCRStatus(
 try{
 
 const processed=
-await preprocess(file,2);
+await preprocess(
+file,
+2
+);
 
 const variants=[
 
@@ -5095,7 +6933,8 @@ i<variants.length;
 i++
 ){
 
-const v=variants[i];
+const v=
+variants[i];
 
 const res=
 await Tesseract.recognize(
@@ -5104,18 +6943,27 @@ v.image,
 {
 
 config:{
-tessedit_pageseg_mode:String(v.psm)
+tessedit_pageseg_mode:
+String(v.psm)
 },
 
 logger:m=>{
 
 if(
-m.status==="recognizing text" &&
+m.status===
+"recognizing text" &&
 m.progress
 ){
 
 setOCRStatus(
-`🔎 Čtu screenshot… ${Math.round(((i+m.progress)/variants.length)*100)} %`
+`🔎 Čtu screenshot… ${
+Math.round(
+(
+(i+m.progress)/
+variants.length
+)*100
+)
+} %`
 );
 
 }
@@ -5125,7 +6973,10 @@ setOCRStatus(
 }
 );
 
-const d=parse(res.data.text);
+const d=
+parse(
+res.data.text
+);
 
 let score=
 (d.client?40:0)+
@@ -5134,27 +6985,39 @@ let score=
 (d.caseNo?35:0);
 
 if(
-/lokace klienta/i.test(res.data.text)
+/lokace klienta/i.test(
+res.data.text
+)
 )
 score+=10;
 
 if(
-/cílové místo|cilove misto/i.test(res.data.text)
+/cílové místo|cilove misto/i.test(
+res.data.text
+)
 )
 score+=10;
 
 if(
-/číslo případu|cislo pripadu/i.test(res.data.text)
+/číslo případu|cislo pripadu/i.test(
+res.data.text
+)
 )
 score+=15;
 
 if(
-d.client&&/\d{3}\s?\d{2}/.test(d.client)
+d.client&&
+/\d{3}\s?\d{2}/.test(
+d.client
+)
 )
 score+=25;
 
 if(
-d.target&&/odtah|servis/i.test(d.target)
+d.target&&
+/odtah|servis/i.test(
+d.target
+)
 )
 score+=15;
 
@@ -5163,36 +7026,48 @@ if(score>best.score){
 best={
 score,
 d,
-text:res.data.text
+text:
+res.data.text
 };
 
 }
 
 }
 
-const d=best.d;
-
+const d=
+best.d;
 
 /*
- * DŮLEŽITÉ:
  * mergeOcrData doplňuje pouze to,
  * co zatím rozpracovaná zakázka nemá.
  */
 mergeOcrData(d);
 
-const p=document.getElementById("ocrPreview");
+const p=
+document.getElementById(
+"ocrPreview"
+);
 
-p.classList.remove("hidden");
+p.classList.remove(
+"hidden"
+);
 
-let limitPreview="nenalezen";
+let limitPreview=
+"nenalezen";
 
-if(d.limitMode==="amount"){
+if(
+d.limitMode==="amount"
+){
 
 limitPreview=
-new Intl.NumberFormat("cs-CZ").format(d.limit)+
+new Intl.NumberFormat(
+"cs-CZ"
+).format(d.limit)+
 " Kč";
 
-}else if(d.limitMode==="real"){
+}else if(
+d.limitMode==="real"
+){
 
 limitPreview=
 "REÁLNÉ NÁKLADY";
@@ -5201,15 +7076,23 @@ limitPreview=
 
 p.innerHTML=
 
-'<div class="routeStatus '+(
-(d.client||d.target||d.caseNo||d.limitMode)
+'<div class="routeStatus '+
+(
+(d.client||
+d.target||
+d.caseNo||
+d.limitMode)
 ?
 "ok"
 :
 "warn"
-)+'">'+
+)+
+'">'+
 (
-(d.client||d.target||d.caseNo||d.limitMode)
+(d.client||
+d.target||
+d.caseNo||
+d.limitMode)
 ?
 "✅ Screenshot zpracován a přidán k rozpracované zakázce."
 :
@@ -5234,12 +7117,22 @@ limitPreview+
 "</div>";
 
 setOCRStatus(
-(d.client||d.target||d.caseNo||d.limitMode)
+(
+d.client||
+d.target||
+d.caseNo||
+d.limitMode
+)
 ?
 "✅ Screenshot přidán. Pokud něco chybí, přidej další screenshot."
 :
 "⚠️ Screenshot přečten, ale údaje nebyly nalezeny.",
-(d.client||d.target||d.caseNo||d.limitMode)
+(
+d.client||
+d.target||
+d.caseNo||
+d.limitMode
+)
 ?
 "ok"
 :
@@ -5261,8 +7154,10 @@ setOCRStatus(
 
 }
 
-
-const input=document.getElementById("jobImage");
+const input=
+document.getElementById(
+"jobImage"
+);
 
 if(input){
 
@@ -5270,7 +7165,9 @@ input.addEventListener(
 "change",
 function(){
 
-const f=this.files&&this.files[0];
+const f=
+this.files&&
+this.files[0];
 
 if(f)
 run(f);
